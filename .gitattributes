@@ -1,0 +1,19 @@
+# Нормализация переводов строк: в репозитории всегда LF,
+# чтобы shell-скрипты (scripts/build_ipa.sh) и CI-workflow работали на macOS/Linux.
+* text=auto eol=lf
+
+*.sh        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.dart      text eol=lf
+*.plist     text eol=lf
+*.pbxproj   text eol=lf
+*.xcconfig  text eol=lf
+*.kts       text eol=lf
+*.swift     text eol=lf
+
+# Бинарники — без нормализации
+*.png       binary
+*.jpg       binary
+*.ico       binary
+*.ttf       binary
