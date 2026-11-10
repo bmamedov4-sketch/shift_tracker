@@ -1,7 +1,7 @@
 name: Build iOS IPA + Android APK
 
-# Запуск вручную из вкладки Actions («Build iOS IPA + Android APK» → «Run workflow»)
-# или автоматически при пуше тега вида v1.0.0
+# Запуск вручную: вкладка Actions → «Build iOS IPA + Android APK» → «Run workflow».
+# Или автоматически при пуше тега вида v1.0.0.
 on:
   workflow_dispatch:
     inputs:
@@ -20,16 +20,27 @@ on:
 
 env:
   FLUTTER_VERSION: '3.47.9'
-  BUNDLE_ID: 'com.ashtr.shifts'
 
 jobs:
   # ---------------------------------------------------------------------------
-  # iOS: .ipa собирается ТОЛЬКО на macOS-раннере (нужен Xcode + codesign)
+  # iOS: .ipa собирается ТОЛЬКО на macOS-раннере (нужен Xcode + codesign).
+  # ВАЖНО: контекст secrets нельзя использовать в `if:` шага — поэтому
+  # значения из secrets сначала попадают в env уровня job, а в `if:`
+  # проверяется уже env (это разрешено).
   # ---------------------------------------------------------------------------
   ios-ipa:
     name: iOS .ipa (macOS)
     runs-on: macos-15
     timeout-minutes: 45
+
+    env:
+      SIGNING_CERT_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+      SIGNING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
+      SIGNING_P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+      SIGNING_KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      SIGNING_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
+      # 'yes' только если оба секрета подписи реально заданы
+      HAS_SIGNING: ${{ secrets.BUILD_CERTIFICATE_BASE64 != '' && secrets.PROVISIONING_PROFILE_BASE64 != '' && 'yes' || 'no' }}
 
     steps:
       - name: Checkout
@@ -49,8 +60,8 @@ jobs:
         run: flutter pub get
 
       # ------------------------- ВАРИАНТ A: без подписи -------------------------
-      # Даёт рабочий .ipa, который затем подписывается на своём Apple ID
-      # через Sideloadly / AltStore / iOS App Signer (7 дней на бесплатном аккаунте).
+      # Даёт рабочий .ipa, который подписывается Apple ID на устройстве
+      # через Sideloadly / AltStore (7 дней на бесплатном аккаунте).
       - name: Сборка без подписи (unsigned .app)
         run: flutter build ios --release --no-codesign
 
@@ -58,12 +69,13 @@ jobs:
         run: |
           set -euo pipefail
           APP_PATH="build/ios/iphoneos/Runner.app"
-          test -d "$APP_PATH"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Не найден $APP_PATH"; exit 1
+          fi
           rm -rf build/ios/unsigned build/ios/ipa-unsigned
           mkdir -p build/ios/unsigned/Payload build/ios/ipa-unsigned
           cp -R "$APP_PATH" build/ios/unsigned/Payload/Runner.app
           cd build/ios/unsigned
-          # shellcheck disable=SC2035
           zip -qry "$GITHUB_WORKSPACE/build/ios/ipa-unsigned/MyShifts-unsigned.ipa" Payload
           ls -lh "$GITHUB_WORKSPACE/build/ios/ipa-unsigned/"
 
@@ -75,42 +87,40 @@ jobs:
           if-no-files-found: error
 
       # ---------------------- ВАРИАНТ B: подписанный .ipa ----------------------
-      # Включается автоматически, если в репозитории заданы секреты:
-      #   BUILD_CERTIFICATE_BASE64  — .p12 сертификата Apple Distribution/Development в base64
-      #   P12_PASSWORD              — пароль .p12
-      #   KEYCHAIN_PASSWORD         — любой пароль для временной связки ключей
-      #   PROVISIONING_PROFILE_BASE64 — .mobileprovision в base64
-      #   DEVELOPMENT_TEAM          — Team ID (10 символов) из аккаунта разработчика
+      # Включается сам, если в репозитории заданы секреты:
+      #   BUILD_CERTIFICATE_BASE64     — .p12 сертификата в base64
+      #   P12_PASSWORD                 — пароль .p12
+      #   KEYCHAIN_PASSWORD            — любой пароль для временной связки ключей
+      #   PROVISIONING_PROFILE_BASE64  — .mobileprovision в base64
+      #   DEVELOPMENT_TEAM             — Team ID (10 символов) из аккаунта Apple
       - name: Импорт сертификата и профиля
-        if: ${{ secrets.BUILD_CERTIFICATE_BASE64 != '' && secrets.PROVISIONING_PROFILE_BASE64 != '' }}
-        env:
-          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
+        if: ${{ env.HAS_SIGNING == 'yes' }}
         run: |
           set -euo pipefail
+          decode_b64() {
+            printf '%s' "$1" | base64 --decode > "$2" 2>/dev/null \
+              || printf '%s' "$1" | base64 -D > "$2"
+          }
+
           KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
           CERT_PATH="$RUNNER_TEMP/certificate.p12"
           PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
 
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o "$CERT_PATH"
-          echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --decode -o "$PROFILE_PATH"
+          decode_b64 "$SIGNING_CERT_BASE64" "$CERT_PATH"
+          decode_b64 "$SIGNING_PROFILE_BASE64" "$PROFILE_PATH"
 
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security create-keychain -p "$SIGNING_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERT_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
-          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$SIGNING_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -P "$SIGNING_P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "$SIGNING_KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychains -d user -s "$KEYCHAIN_PATH"
 
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Сборка подписанного .ipa
-        if: ${{ secrets.BUILD_CERTIFICATE_BASE64 != '' && secrets.PROVISIONING_PROFILE_BASE64 != '' }}
-        env:
-          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
+        if: ${{ env.HAS_SIGNING == 'yes' }}
         run: |
           set -euo pipefail
           flutter build ipa \
@@ -118,10 +128,10 @@ jobs:
             --export-method=${{ inputs.export_method || 'development' }} \
             --build-name=1.0.0 \
             --build-number=${{ github.run_number }} \
-            --xcargs "DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM} -allowProvisioningUpdates"
+            --xcargs "DEVELOPMENT_TEAM=${SIGNING_TEAM} -allowProvisioningUpdates"
 
       - name: Загрузить подписанный .ipa
-        if: ${{ secrets.BUILD_CERTIFICATE_BASE64 != '' && secrets.PROVISIONING_PROFILE_BASE64 != '' }}
+        if: ${{ env.HAS_SIGNING == 'yes' }}
         uses: actions/upload-artifact@v4
         with:
           name: MyShifts-signed-ipa
@@ -129,7 +139,7 @@ jobs:
           if-no-files-found: error
 
   # ---------------------------------------------------------------------------
-  # Android: APK как побочный артефакт (Windows-машина без Android SDK)
+  # Android: APK как побочный артефакт (локально нет Android SDK)
   # ---------------------------------------------------------------------------
   android-apk:
     name: Android APK (ubuntu)
@@ -156,7 +166,7 @@ jobs:
       - name: Зависимости
         run: flutter pub get
 
-      - name: Тесты и анализатор
+      - name: Анализатор и тесты
         run: |
           flutter analyze
           flutter test
