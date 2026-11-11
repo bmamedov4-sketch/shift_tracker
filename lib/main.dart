@@ -330,18 +330,12 @@ final class IosPalette {
     required this.fill,
     required this.accent,
     required this.accentSoft,
-    required this.accentDeep,
     required this.accentSolid,
     required this.onAccent,
-    required this.segmentThumb,
     required this.today,
     required this.cycleStart,
     required this.manual,
-    required this.warning,
-    required this.warningSoft,
     required this.danger,
-    required this.dangerSoft,
-    required this.shadow,
     required this.noneBg,
     required this.noneFg,
     required this.offBg,
@@ -380,9 +374,6 @@ final class IosPalette {
   /// Полупрозрачный акцент для активных пилюль.
   final Color accentSoft;
 
-  /// Текст и иконки на тонированной подложке [accentSoft] (повышенный контраст).
-  final Color accentDeep;
-
   /// Плотная заливка основных кнопок; в светлой теме — #007AFF (как в iOS,
   /// ≈4.0:1 для крупного/полужирного текста), в тёмной — затемнённый #0A6CD6
   /// для контраста ≥ 4.5:1 с [onAccent].
@@ -390,9 +381,6 @@ final class IosPalette {
 
   /// Текст и иконки на [accentSolid].
   final Color onAccent;
-
-  /// «Таблетка» активного сегмента.
-  final Color segmentThumb;
 
   /// Обводка «сегодня».
   final Color today;
@@ -403,20 +391,8 @@ final class IosPalette {
   /// Обводка ручной правки.
   final Color manual;
 
-  /// Предупреждающий текст.
-  final Color warning;
-
-  /// Фон предупреждающего баннера.
-  final Color warningSoft;
-
   /// Опасное действие.
   final Color danger;
-
-  /// Полупрозрачная подложка опасного действия.
-  final Color dangerSoft;
-
-  /// Тень карточек.
-  final Color shadow;
 
   /// Ячейка «не задано».
   final Color noneBg;
@@ -430,62 +406,50 @@ final class IosPalette {
 
   static const IosPalette light = IosPalette(
     brightness: Brightness.light,
-    canvas: Color(0xFFF2F2F7),
+    canvas: Color(0xFFF7F7F5),
     card: Color(0xFFFFFFFF),
-    cardAlt: Color(0xFFF7F7FA),
-    label: Color(0xFF000000),
-    labelSecondary: Color(0xFF8A8A8E),
-    labelTertiary: Color(0xFFC4C4C8),
-    separator: Color(0xFFE3E3E8),
-    fill: Color(0xFFEDEDF0),
-    accent: Color(0xFF007AFF),
-    accentSoft: Color(0x1A007AFF),
-    accentDeep: Color(0xFF0055B8),
-    accentSolid: Color(0xFF007AFF),
+    cardAlt: Color(0xFFFFFFFF),
+    label: Color(0xFF1C1C1E),
+    labelSecondary: Color(0xFF6E6E73),
+    labelTertiary: Color(0xFF8A8A8F),
+    separator: Color(0xFFECECEC),
+    fill: Color(0xFFEFEFF2),
+    accent: Color(0xFF2F6BFF),
+    accentSoft: Color(0x142F6BFF),
+    accentSolid: Color(0xFF2F6BFF),
     onAccent: Color(0xFFFFFFFF),
-    segmentThumb: Color(0xFFFFFFFF),
-    today: Color(0xFF007AFF),
-    cycleStart: Color(0xFFAF52DE),
-    manual: Color(0xFFFF9500),
-    warning: Color(0xFFB25000),
-    warningSoft: Color(0xFFFFF4E0),
-    danger: Color(0xFFFF3B30),
-    dangerSoft: Color(0x14FF3B30),
-    shadow: Color(0x0F000000),
-    noneBg: Color(0xFFEFF0F5),
-    noneFg: Color(0xFF9AA0AE),
-    offBg: Color(0xFFE8EAF1),
-    offFg: Color(0xFF5A6172),
+    today: Color(0xFF2F6BFF),
+    cycleStart: Color(0xFF8E5CF0),
+    manual: Color(0xFFFF8A1F),
+    danger: Color(0xFFE5484D),
+    noneBg: Color(0xFFF2F2F4),
+    noneFg: Color(0xFF8E8E93),
+    offBg: Color(0xFFF2F2F4),
+    offFg: Color(0xFF6E6E73),
   );
 
   static const IosPalette dark = IosPalette(
     brightness: Brightness.dark,
-    canvas: Color(0xFF000000),
-    card: Color(0xFF1C1C1E),
+    canvas: Color(0xFF0E0E10),
+    card: Color(0xFF1A1A1D),
     cardAlt: Color(0xFF2C2C2E),
-    label: Color(0xFFFFFFFF),
-    labelSecondary: Color(0xFF98989F),
-    labelTertiary: Color(0xFF6C6C70),
-    separator: Color(0xFF38383A),
-    fill: Color(0xFF2C2C2E),
-    accent: Color(0xFF0A84FF),
-    accentSoft: Color(0x2E0A84FF),
-    accentDeep: Color(0xFF0A84FF),
-    accentSolid: Color(0xFF0A6CD6),
-    onAccent: Color(0xFFFFFFFF),
-    segmentThumb: Color(0xFF636366),
-    today: Color(0xFF0A84FF),
-    cycleStart: Color(0xFFBF5AF2),
-    manual: Color(0xFFFF9F0A),
-    warning: Color(0xFFFFB340),
-    warningSoft: Color(0x332B1F0A),
-    danger: Color(0xFFFF453A),
-    dangerSoft: Color(0x24FF453A),
-    shadow: Color(0x00000000),
-    noneBg: Color(0xFF232326),
-    noneFg: Color(0xFF8A8A8E),
-    offBg: Color(0xFF2C2C2E),
-    offFg: Color(0xFFB0B0B6),
+    label: Color(0xFFF2F2F4),
+    labelSecondary: Color(0xFF9A9AA0),
+    labelTertiary: Color(0xFF7A7A80),
+    separator: Color(0xFF2A2A2E),
+    fill: Color(0xFF1F1F23),
+    accent: Color(0xFF5B8BFF),
+    accentSoft: Color(0x265B8BFF),
+    accentSolid: Color(0xFF5B8BFF),
+    onAccent: Color(0xFF0E0E10),
+    today: Color(0xFF5B8BFF),
+    cycleStart: Color(0xFFA583FF),
+    manual: Color(0xFFFF9F4A),
+    danger: Color(0xFFFF6B6F),
+    noneBg: Color(0xFF1F1F23),
+    noneFg: Color(0xFF8E8E93),
+    offBg: Color(0xFF1F1F23),
+    offFg: Color(0xFFA0A0A6),
   );
 }
 
@@ -496,16 +460,11 @@ IosPalette iosPalette(BuildContext context) {
 }
 
 /// Единый стиль карточки в духе iOS 18 inset grouped.
-BoxDecoration iosCardDecoration(IosPalette p, {double radius = 22}) {
+BoxDecoration iosCardDecoration(IosPalette p, {double radius = 16}) {
   return BoxDecoration(
     color: p.card,
     borderRadius: BorderRadius.circular(radius),
     border: Border.all(color: p.separator, width: 0.6),
-    boxShadow: p.shadow == Colors.transparent
-        ? null
-        : <BoxShadow>[
-            BoxShadow(color: p.shadow, blurRadius: 20, offset: const Offset(0, 6)),
-          ],
   );
 }
 
@@ -680,17 +639,20 @@ final class AppTheme {
       ),
       dividerTheme: DividerThemeData(color: p.separator, thickness: 0.6, space: 0.6),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: p.isDark ? p.cardAlt : const Color(0xFF1C1C1E),
-        contentTextStyle: const TextStyle(color: Colors.white),
+        backgroundColor: p.cardAlt,
+        contentTextStyle: TextStyle(color: p.label, fontSize: 14, fontWeight: FontWeight.w500),
         behavior: SnackBarBehavior.floating,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: p.separator, width: 0.6),
+        ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: p.card,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: Colors.transparent,
@@ -1179,38 +1141,36 @@ class _ShiftsPageState extends State<ShiftsPage> {
         ),
         title: Text(
           'Мои смены',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.4, color: p.label),
         ),
         actions: <Widget>[
           TextButton.icon(
             onPressed: _openYearCycleDialog,
             style: TextButton.styleFrom(
-              backgroundColor: p.accentSoft,
-              foregroundColor: p.accentDeep,
+              backgroundColor: Colors.transparent,
+              foregroundColor: p.accent,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: const StadiumBorder(),
+              minimumSize: const Size(44, 44),
               textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
-            icon: const Icon(Icons.add_rounded, size: 16),
-            label: const Text('Цикл'),
+            icon: const Icon(Icons.add_rounded, size: 18),
+            label: const Text('Цикл', maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
-          const SizedBox(width: 8),
-          _appBarIcon(
-            icon: Icons.bar_chart_rounded,
+          IconButton(
+            icon: const Icon(Icons.bar_chart_rounded),
             tooltip: 'Сводка за год',
+            color: p.label,
             onPressed: _openYearOverview,
-            p: p,
+          ),
+          IconButton(
+            onPressed: _openSettingsSheet,
+            tooltip: 'Настройки',
+            color: p.label,
+            icon: const Icon(Icons.settings_outlined),
           ),
           const SizedBox(width: 8),
-          _appBarIcon(
-            icon: Icons.settings_outlined,
-            tooltip: 'Настройки',
-            onPressed: _openSettingsSheet,
-            p: p,
-          ),
-          const SizedBox(width: 16),
         ],
       ),
       body: SwipeArea(
@@ -1236,44 +1196,6 @@ class _ShiftsPageState extends State<ShiftsPage> {
     );
   }
 
-  /// Компактная иконка в «плитке» для AppBar.
-  Widget _appBarIcon({
-    required IconData icon,
-    required String tooltip,
-    required VoidCallback onPressed,
-    required IosPalette p,
-  }) {
-    return Container(
-      width: 34,
-      height: 34,
-      decoration: BoxDecoration(color: p.fill, borderRadius: BorderRadius.circular(11)),
-      child: IconButton(
-        onPressed: onPressed,
-        tooltip: tooltip,
-        padding: EdgeInsets.zero,
-        iconSize: 18,
-        color: p.label,
-        constraints: const BoxConstraints(),
-        icon: Icon(icon),
-      ),
-    );
-  }
-
-  /// Круглая кнопка-иконка (навигация по месяцам, закрытие шторки).
-  Widget _circleButton(IconData icon, {VoidCallback? onTap, double size = 32, IosPalette? palette}) {
-    final IosPalette p = palette ?? iosPalette(context);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(color: p.fill, shape: BoxShape.circle),
-        child: Icon(icon, size: 18, color: p.labelSecondary),
-      ),
-    );
-  }
-
   Widget _buildMonthHeader() {
     final IosPalette p = iosPalette(context);
     final DateTime today = todayUtc();
@@ -1294,9 +1216,9 @@ class _ShiftsPageState extends State<ShiftsPage> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 30,
+                      fontSize: 28,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: -0.9,
+                      letterSpacing: -0.6,
                       color: p.label,
                     ),
                   ),
@@ -1307,7 +1229,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
                         : 'Точек старта: ${_cycleRules.where((CycleRule r) => parseDateKey(r.startDate).year == _visibleMonth.year).length} • свайп ← →',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: p.labelSecondary),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: p.labelSecondary),
                   ),
                 ],
               ),
@@ -1315,39 +1237,37 @@ class _ShiftsPageState extends State<ShiftsPage> {
           ),
           const SizedBox(width: 12),
           if (showToday) ...<Widget>[
-            Flexible(
-              child: Semantics(
-                button: true,
-                label: 'Текущий месяц',
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => setState(() => _visibleMonth = firstDayOfMonth(todayUtc())),
-                  child: Container(
-                    height: 34,
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: p.accentSoft,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Сегодня',
-                        maxLines: 1,
-                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.accentDeep),
-                      ),
-                    ),
-                  ),
-                ),
+            TextButton(
+              onPressed: () => setState(() => _visibleMonth = firstDayOfMonth(todayUtc())),
+              style: TextButton.styleFrom(
+                foregroundColor: p.accent,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(44, 44),
+              ),
+              child: const Text(
+                'Сегодня',
+                maxLines: 1,
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
-            const SizedBox(width: 8),
           ],
-          _circleButton(Icons.chevron_left_rounded, onTap: () => _shiftMonth(-1), palette: p),
-          const SizedBox(width: 8),
-          _circleButton(Icons.chevron_right_rounded, onTap: () => _shiftMonth(1), palette: p),
+          _navChevron(Icons.chevron_left_rounded, onTap: () => _shiftMonth(-1), p: p),
+          _navChevron(Icons.chevron_right_rounded, onTap: () => _shiftMonth(1), p: p),
         ],
+      ),
+    );
+  }
+
+  /// Прозрачная кнопка-шеврон для навигации по месяцам.
+  Widget _navChevron(IconData icon, {required VoidCallback onTap, required IosPalette p}) {
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: IconButton(
+        onPressed: onTap,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        icon: Icon(icon, size: 22, color: p.label),
       ),
     );
   }
@@ -1361,20 +1281,17 @@ class _ShiftsPageState extends State<ShiftsPage> {
         title: 'Старт цикла с 1 января ${_visibleMonth.year} г.',
       ),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: p.warningSoft,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: p.warning.withValues(alpha: 0.25), width: 0.8),
-        ),
+        padding: const EdgeInsets.all(16),
+        decoration: iosCardDecoration(p),
         child: Row(
           children: <Widget>[
-            const Text('📅', style: TextStyle(fontSize: 18)),
-            const SizedBox(width: 10),
+            Icon(Icons.event_available_outlined, color: p.accent, size: 22),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Цикл на ${_visibleMonth.year} г. не запущен. Нажмите, чтобы начать с 1 янв.',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.warning, height: 1.25),
+                maxLines: 3,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: p.label, height: 1.3),
               ),
             ),
           ],
@@ -1390,7 +1307,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
     final List<FontFeature> tabular = const <FontFeature>[FontFeature.tabularFigures()];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: iosCardDecoration(p),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1400,74 +1317,73 @@ class _ShiftsPageState extends State<ShiftsPage> {
             onChanged: (PeriodMode mode) => setState(() => _period = mode),
           ),
           const SizedBox(height: 16),
+          Text(
+            _period.summaryLabel,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: p.labelSecondary,
+            ),
+          ),
+          const SizedBox(height: 6),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      _period.summaryLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.2,
-                        color: p.labelSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        formatMoney(stats.total),
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -1,
-                          color: p.label,
-                          fontFeatures: tabular,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    '${formatHours(stats.hours)} ч',
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    formatMoney(stats.total),
+                    maxLines: 1,
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -1,
                       color: p.label,
                       fontFeatures: tabular,
                     ),
                   ),
-                  Text('часов', style: TextStyle(fontSize: 11, color: p.labelTertiary)),
-                ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '${formatHours(stats.hours)} ч',
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: p.labelSecondary,
+                  fontFeatures: tabular,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Container(height: 0.6, color: p.separator),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          Divider(height: 24, color: p.separator),
+          Row(
             children: <Widget>[
-              _chip('☀️ Дней: ${stats.dayCount}', p),
-              _chip('🌙 Ночей: ${stats.nightCount}', p),
+              Expanded(
+                child: Text(
+                  '☀️ Дней: ${stats.dayCount}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.label),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  '🌙 Ночей: ${stats.nightCount}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.label),
+                ),
+              ),
             ],
           ),
           if (hasExtras) ...<Widget>[
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             if (stats.overtimeCount > 0) _extraRow('⭐ Подработок', '${stats.overtimeCount}', p),
             if (stats.vacationCount > 0)
               _extraRow('🏖️ Отпуск: ${stats.vacationCount} дн.', formatMoney(stats.vacationMoney), p),
@@ -1484,24 +1400,6 @@ class _ShiftsPageState extends State<ShiftsPage> {
     );
   }
 
-  /// Компактная «пилюля» со статистикой.
-  Widget _chip(String text, IosPalette p) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: p.fill, borderRadius: BorderRadius.circular(100)),
-      child: Text(
-        text,
-        maxLines: 1,
-        style: TextStyle(
-          fontSize: 12.5,
-          fontWeight: FontWeight.w600,
-          color: p.label,
-          fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
-        ),
-      ),
-    );
-  }
-
   Widget _extraRow(String label, String amount, IosPalette p) {
     return Padding(
       padding: const EdgeInsets.only(top: 6),
@@ -1512,7 +1410,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12.5, color: p.labelSecondary),
+              style: TextStyle(fontSize: 13, color: p.labelSecondary),
             ),
           ),
           const SizedBox(width: 8),
@@ -1549,11 +1447,12 @@ class _ShiftsPageState extends State<ShiftsPage> {
                 child: Center(
                   child: Text(
                     label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.4,
-                      color: i == 6 ? p.danger : p.labelSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: p.labelSecondary,
                     ),
                   ),
                 ),
@@ -1568,9 +1467,9 @@ class _ShiftsPageState extends State<ShiftsPage> {
             itemCount: leading + total,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisExtent: 66,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 5,
+              mainAxisExtent: 56,
+              crossAxisSpacing: 4,
+              mainAxisSpacing: 4,
             ),
             itemBuilder: (BuildContext context, int index) {
               if (index < leading) return const SizedBox.shrink();
@@ -1582,65 +1481,96 @@ class _ShiftsPageState extends State<ShiftsPage> {
     );
   }
 
+  /// Цвет точки статуса в ячейке календаря; null — точка не рисуется.
+  Color? _dotColorFor(ShiftStatus status, IosPalette p) {
+    switch (status.key) {
+      case 'NONE':
+        return null;
+      case 'DAY_1':
+      case 'DAY_2':
+        return const Color(0xFFF5A524);
+      case 'OVERTIME_DAY':
+        return const Color(0xFFFF7A00);
+      case 'NIGHT_1':
+      case 'NIGHT_2':
+        return const Color(0xFF5E6AD2);
+      case 'OVERTIME_NIGHT':
+        return const Color(0xFFB45AE0);
+      case 'VACATION':
+        return const Color(0xFF30A46C);
+      case 'SICK':
+        return const Color(0xFFE5484D);
+      case 'SLEEP':
+        return const Color(0xFF9AA0A6);
+      default:
+        return p.labelTertiary;
+    }
+  }
+
   Widget _buildDayCell(DateTime date) {
     final IosPalette p = iosPalette(context);
-    final bool dark = p.isDark;
     final ShiftStatus status = _statusFor(date);
-    final ShiftPalette palette = _paletteFor(status, dark);
     final bool isToday = isSameDay(date, todayUtc());
     final bool isCycleStart = _cycleRuleStartingAt(date) != null;
     final bool isManual = _overrides.containsKey(dateKey(date));
+    final Color? dotColor = _dotColorFor(status, p);
+    final bool isSunday = date.weekday == DateTime.sunday;
 
-    Color borderColor = p.separator;
-    double borderWidth = 0;
-    if (isToday) {
-      borderColor = p.today;
-      borderWidth = 2;
-    } else if (isCycleStart) {
-      borderColor = p.cycleStart;
-      borderWidth = 2;
-    } else if (isManual) {
-      borderColor = p.manual;
-      borderWidth = 1.5;
+    // Рамка: ручная правка > сегодня. Сегодня всегда получает акцентную подложку.
+    BoxBorder? border;
+    Color background = Colors.transparent;
+    if (isToday) background = p.accentSoft;
+    if (isManual) {
+      border = Border.all(color: p.manual, width: 1.5);
+    } else if (isToday) {
+      border = Border.all(color: p.today, width: 1.5);
     }
+
+    final Widget dayContent = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          '${date.day}',
+          maxLines: 1,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: isSunday ? (p.isDark ? p.danger : const Color(0xFFC13B3F)) : p.label,
+            height: 1,
+            fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+          ),
+        ),
+        const SizedBox(height: 4),
+        dotColor == null
+            ? const SizedBox(height: 5)
+            : Container(
+                width: 5,
+                height: 5,
+                decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+              ),
+      ],
+    );
 
     final Widget cell = Container(
       decoration: BoxDecoration(
-        color: palette.bgFor(dark),
-        borderRadius: BorderRadius.circular(14),
-        border: borderWidth > 0 ? Border.all(color: borderColor, width: borderWidth) : null,
+        color: background,
+        borderRadius: BorderRadius.circular(12),
+        border: border,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
         children: <Widget>[
-          Text(
-            '${date.day}',
-            maxLines: 1,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: palette.fgFor(dark),
-              height: 1,
-              fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
-            ),
-          ),
-          const SizedBox(height: 2),
-          Flexible(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                status.short,
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w600,
-                  color: palette.fgFor(dark).withValues(alpha: 0.85),
-                ),
+          Center(child: dayContent),
+          if (isCycleStart)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: Container(
+                width: 5,
+                height: 5,
+                decoration: BoxDecoration(color: p.cycleStart, shape: BoxShape.circle),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -1656,13 +1586,30 @@ class _ShiftsPageState extends State<ShiftsPage> {
     final IosPalette p = iosPalette(context);
     return SizedBox(
       width: double.infinity,
-      child: Wrap(
-        spacing: 14,
-        runSpacing: 8,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _legendDot(p.today, 'сегодня', p),
-          _legendDot(p.cycleStart, 'старт цикла', p),
-          _legendDot(p.manual, 'ручная правка', p),
+          Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: <Widget>[
+              _legendDot(const Color(0xFFF5A524), 'День', p),
+              _legendDot(const Color(0xFF5E6AD2), 'Ночь', p),
+              _legendDot(const Color(0xFFFF7A00), 'Подр.', p),
+              _legendDot(const Color(0xFF30A46C), 'Отпуск', p),
+              _legendDot(const Color(0xFFE5484D), 'Больн.', p),
+              _legendDot(const Color(0xFFB45AE0), 'Подр. ночь', p),
+              _legendDot(p.labelSecondary, 'Вых', p),
+              _legendDot(const Color(0xFF9AA0A6), 'Отсып', p),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Рамка — сегодня · оранжевая — ручная правка · фиолетовая точка — старт цикла',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12, color: p.labelSecondary, height: 1.3),
+          ),
         ],
       ),
     );
@@ -1673,12 +1620,16 @@ class _ShiftsPageState extends State<ShiftsPage> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Container(
-          width: 8,
-          height: 8,
+          width: 6,
+          height: 6,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
-        Text(label, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500, color: p.labelSecondary)),
+        Text(
+          label,
+          maxLines: 1,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: p.labelSecondary),
+        ),
       ],
     );
   }
@@ -1698,67 +1649,70 @@ class _ShiftsPageState extends State<ShiftsPage> {
       builder: (BuildContext ctx) {
         final IosPalette p = iosPalette(ctx);
         return AlertDialog(
+          backgroundColor: p.card,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+          titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
+          contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
           actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+          title: Row(
+            children: <Widget>[
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: palette.bgFor(dark),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      formatDateRu(date),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: p.label,
+                        fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      status.label,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.labelSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: p.fill,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              formatDateRu(date),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: p.label,
-                                fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              status.label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.labelSecondary),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          color: palette.bgFor(dark),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
                 _sectionTitle('Быстрая установка', p),
                 const SizedBox(height: 8),
                 Row(
                   children: <Widget>[
-                    Expanded(child: _quickAction(ctx, St.overtimeDay, '☀️ Подр. День', date)),
+                    Expanded(
+                      child: _quickAction(ctx, St.overtimeDay, 'Подр. День', date, icon: Icons.wb_sunny_outlined),
+                    ),
                     const SizedBox(width: 8),
-                    Expanded(child: _quickAction(ctx, St.overtimeNight, '🌙 Подр. Ночь', date)),
+                    Expanded(
+                      child: _quickAction(ctx, St.overtimeNight, 'Подр. Ночь', date, icon: Icons.nightlight_outlined),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -1766,37 +1720,31 @@ class _ShiftsPageState extends State<ShiftsPage> {
                   children: <Widget>[
                     Expanded(child: _quickAction(ctx, St.vacation, '🏖️ Отпуск', date)),
                     const SizedBox(width: 8),
-                    Expanded(child: _quickAction(ctx, St.sick, '💊 Больничный', date)),
+                    Expanded(
+                      child: _quickAction(ctx, St.sick, 'Больничный', date, icon: Icons.medical_services_outlined),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                _quickAction(ctx, St.manualOff, '☕ Внеплановый выходной', date),
-                const SizedBox(height: 16),
+                _quickAction(ctx, St.manualOff, 'Внеплановый выходной', date, icon: Icons.event_busy_outlined),
+                const SizedBox(height: 8),
                 if (hasOverride)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _dialogButton(
-                      label: '🔄 Сбросить к исходному графику',
-                      background: p.accentSoft,
-                      foreground: p.accent,
-                      onTap: () => Navigator.of(ctx).pop(const DayAction(DayAction.reset)),
-                    ),
+                  _dialogButton(
+                    label: 'Сбросить к исходному графику',
+                    foreground: p.accent,
+                    onTap: () => Navigator.of(ctx).pop(const DayAction(DayAction.reset)),
                   ),
                 _dialogButton(
-                  label: '🚀 Начать новый цикл с этой даты',
-                  background: p.accentSoft,
+                  label: 'Начать новый цикл с этой даты',
                   foreground: p.accent,
                   onTap: () => Navigator.of(ctx).pop(const DayAction(DayAction.startCycle)),
                 ),
-                if (startRule != null) ...<Widget>[
-                  const SizedBox(height: 8),
+                if (startRule != null)
                   _dialogButton(
-                    label: '🗑️ Удалить эту точку старта',
-                    background: p.dangerSoft,
+                    label: 'Удалить эту точку старта',
                     foreground: p.danger,
                     onTap: () => Navigator.of(ctx).pop(const DayAction(DayAction.deleteStart)),
                   ),
-                ],
               ],
             ),
           ),
@@ -1838,58 +1786,68 @@ class _ShiftsPageState extends State<ShiftsPage> {
     }
   }
 
-  Widget _quickAction(BuildContext dialogContext, ShiftStatus status, String label, DateTime date) {
+  /// Кнопка быстрой установки статуса в диалоге дня (высота 44, радиус 12).
+  Widget _quickAction(
+    BuildContext dialogContext,
+    ShiftStatus status,
+    String label,
+    DateTime date, {
+    IconData? icon,
+  }) {
     final bool active = _overrides[dateKey(date)] == status.key;
     final IosPalette p = iosPalette(dialogContext);
+    final Color fg = active ? p.accent : p.label;
+    final Widget text = Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: fg),
+    );
     return Material(
       color: active ? p.accentSoft : p.fill,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => Navigator.of(dialogContext).pop(DayAction(DayAction.overrideStatus, statusKey: status.key)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 13),
-          child: Center(
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: active ? p.accent : p.label,
-              ),
-            ),
-          ),
+        child: Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          alignment: Alignment.center,
+          child: icon == null
+              ? text
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(icon, size: 18, color: fg),
+                    const SizedBox(width: 6),
+                    Flexible(child: text),
+                  ],
+                ),
         ),
       ),
     );
   }
 
-  /// Кнопка-действие внутри диалога дня.
+  /// Текстовая кнопка-действие внутри диалога дня (на всю ширину).
   Widget _dialogButton({
     required String label,
-    required Color background,
     required Color foreground,
     required VoidCallback onTap,
   }) {
-    return Material(
-      color: background,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Container(
-          height: 46,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: foreground),
-          ),
-        ),
+    return TextButton(
+      onPressed: onTap,
+      style: TextButton.styleFrom(
+        foregroundColor: foreground,
+        minimumSize: const Size.fromHeight(44),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: Text(
+        label,
+        maxLines: 2,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -1903,19 +1861,28 @@ class _ShiftsPageState extends State<ShiftsPage> {
         final IosPalette p = iosPalette(ctx);
         final bool dark = p.isDark;
         return AlertDialog(
+          backgroundColor: p.card,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-          contentPadding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          contentPadding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 title ?? 'Новый цикл',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: p.label),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: p.label),
               ),
               const SizedBox(height: 4),
               Text(
                 'Какая смена выпадает на ${formatDateRu(date)}?',
-                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: p.labelSecondary),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.labelSecondary),
               ),
             ],
           ),
@@ -1924,40 +1891,40 @@ class _ShiftsPageState extends State<ShiftsPage> {
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: List<Widget>.generate(St.baseCycle.length, (int i) {
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: List<Widget>.generate(St.baseCycle.length * 2 - 1, (int idx) {
+                  if (idx.isOdd) {
+                    return Divider(height: 1, thickness: 1, color: p.separator);
+                  }
+                  final int i = idx ~/ 2;
                   final ShiftStatus status = St.baseCycle[i];
                   final ShiftPalette palette = _paletteFor(status, dark);
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Material(
-                      color: p.fill,
-                      borderRadius: BorderRadius.circular(14),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(14),
-                        onTap: () => Navigator.of(ctx).pop(i),
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  color: palette.bgFor(dark),
-                                  shape: BoxShape.circle,
-                                ),
+                  return InkWell(
+                    onTap: () => Navigator.of(ctx).pop(i),
+                    child: SizedBox(
+                      height: 48,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: palette.bgFor(dark),
+                                shape: BoxShape.circle,
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  status.label,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: p.label),
-                                ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                status.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: p.label),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -2040,45 +2007,42 @@ class _ShiftsPageState extends State<ShiftsPage> {
               child: Container(
                 decoration: BoxDecoration(
                   color: p.canvas,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-                  border: Border(top: BorderSide(color: p.separator, width: 0.6)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 ),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Center(
-                        child: Container(
-                          width: 36,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: p.labelTertiary.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
                       Row(
                         children: <Widget>[
                           Expanded(
                             child: Text(
                               'Настройки',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w700,
-                                letterSpacing: -0.5,
+                                letterSpacing: -0.4,
                                 color: p.label,
                               ),
                             ),
                           ),
-                          _circleButton(Icons.close_rounded, size: 30, palette: p, onTap: () => Navigator.of(ctx).pop()),
+                          IconButton(
+                            onPressed: () => Navigator.of(ctx).pop(),
+                            icon: Icon(Icons.close_rounded, color: p.labelSecondary),
+                            tooltip: 'Закрыть',
+                            visualDensity: VisualDensity.compact,
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         'Индексация: $editKey • открытый месяц: $ym',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 11.5, color: p.labelTertiary),
                       ),
                       const SizedBox(height: 18),
@@ -2089,7 +2053,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
                           Expanded(
                             child: _themePill(
                               icon: Icons.brightness_auto_outlined,
-                              label: 'Системная',
+                              label: 'Система',
                               selected: localThemeMode == ThemeMode.system,
                               p: p,
                               onTap: () {
@@ -2102,7 +2066,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
                           Expanded(
                             child: _themePill(
                               icon: Icons.light_mode_outlined,
-                              label: 'Тема светлая',
+                              label: 'Светлая',
                               selected: localThemeMode == ThemeMode.light,
                               p: p,
                               onTap: () {
@@ -2115,7 +2079,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
                           Expanded(
                             child: _themePill(
                               icon: Icons.dark_mode_outlined,
-                              label: 'Тема тёмная',
+                              label: 'Тёмная',
                               selected: localThemeMode == ThemeMode.dark,
                               p: p,
                               onTap: () {
@@ -2180,7 +2144,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
                       ),
                       const SizedBox(height: 24),
                       SizedBox(
-                        height: 50,
+                        height: 48,
                         child: FilledButton(
                           onPressed: () {
                             final WageRates newRates = collect();
@@ -2197,17 +2161,21 @@ class _ShiftsPageState extends State<ShiftsPage> {
                           style: FilledButton.styleFrom(
                             backgroundColor: p.accentSolid,
                             foregroundColor: p.onAccent,
-                            minimumSize: Size.fromHeight(50),
+                            minimumSize: const Size.fromHeight(48),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                           ),
-                          child: const Text('💾 Сохранить'),
+                          child: const Text(
+                            '💾 Сохранить',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
                       SizedBox(
-                        height: 50,
-                        child: FilledButton(
+                        height: 48,
+                        child: TextButton(
                           onPressed: () {
                             final WageRates newRates = collect();
                             setState(() {
@@ -2220,14 +2188,17 @@ class _ShiftsPageState extends State<ShiftsPage> {
                             Navigator.of(ctx).pop();
                             _snack('Оклад повышен с $ym');
                           },
-                          style: FilledButton.styleFrom(
-                            backgroundColor: p.accentSoft,
-                            foregroundColor: p.accentDeep,
-                            minimumSize: Size.fromHeight(50),
+                          style: TextButton.styleFrom(
+                            foregroundColor: p.accent,
+                            minimumSize: const Size.fromHeight(48),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                           ),
-                          child: const Text('📈 Повысить оклад'),
+                          child: const Text(
+                            '📈 Повысить оклад',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -2278,74 +2249,68 @@ class _ShiftsPageState extends State<ShiftsPage> {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        height: 38,
+        height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
           color: selected ? p.accentSoft : p.fill,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? p.accent : Colors.transparent, width: 1.2),
+          borderRadius: BorderRadius.circular(10),
+          border: selected ? Border.all(color: p.accent, width: 1.2) : null,
         ),
-        child: Center(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(icon, size: 15, color: selected ? p.accent : p.labelSecondary),
-                const SizedBox(width: 5),
-                Text(
-                  label,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: selected ? p.accent : p.labelSecondary,
-                  ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(icon, size: 15, color: selected ? p.accent : p.labelSecondary),
+            const SizedBox(width: 5),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: selected ? p.accent : p.labelSecondary,
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
   Widget _rateField(TextEditingController controller, String label, IosPalette p) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
-      decoration: BoxDecoration(
-        color: p.fill,
-        borderRadius: BorderRadius.circular(12),
+    return TextField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+      ],
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: p.label,
+        fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: p.labelSecondary),
-          ),
-          TextField(
-            controller: controller,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            ],
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: p.label,
-              fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
-            ),
-            decoration: const InputDecoration(
-              isDense: true,
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ),
-        ],
+      decoration: InputDecoration(
+        isDense: true,
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 13, color: p.labelSecondary),
+        floatingLabelStyle: TextStyle(fontSize: 13, color: p.labelSecondary),
+        filled: false,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: p.labelSecondary, width: 0.8),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: p.labelSecondary, width: 0.8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: p.accent, width: 1.5),
+        ),
       ),
     );
   }
@@ -2365,28 +2330,34 @@ class _ShiftsPageState extends State<ShiftsPage> {
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => onSelect(index),
-          child: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: palette.bgFor(dark),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: selected ? p.accent : p.separator,
-                width: selected ? 2 : 0.8,
-              ),
-            ),
+          child: SizedBox(
+            width: 44,
+            height: 44,
             child: Center(
-              child: selected
-                  ? Icon(Icons.check_rounded, size: 14, color: palette.fgFor(dark))
-                  : Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: palette.fgFor(dark),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: palette.bgFor(dark),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected ? p.accent : p.separator,
+                    width: selected ? 2 : 0.8,
+                  ),
+                ),
+                child: Center(
+                  child: selected
+                      ? Icon(Icons.check_rounded, size: 16, color: palette.fgFor(dark))
+                      : Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: palette.fgFor(dark),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                ),
+              ),
             ),
           ),
         );
@@ -2411,7 +2382,7 @@ class PeriodTabs extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: p.fill,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: PeriodMode.values.map((PeriodMode mode) {
@@ -2423,23 +2394,23 @@ class PeriodTabs extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 160),
                 curve: Curves.easeOut,
-                padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                 decoration: BoxDecoration(
-                  color: selected ? p.segmentThumb : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: selected
-                      ? <BoxShadow>[BoxShadow(color: p.shadow, blurRadius: 6, offset: const Offset(0, 2))]
-                      : null,
+                  color: selected ? p.card : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  border: selected ? Border.all(color: p.separator, width: 0.6) : null,
                 ),
-                child: Text(
-                  mode.shortLabel,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                    color: selected ? p.label : p.labelSecondary,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    mode.shortLabel,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: selected ? p.label : p.labelSecondary,
+                    ),
                   ),
                 ),
               ),
@@ -2605,7 +2576,9 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
         ),
         title: Text(
           'Сводка за $_year г.',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.4, color: p.label),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: p.label),
         ),
       ),
       body: SwipeArea(
@@ -2654,7 +2627,7 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
               itemCount: months.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                mainAxisExtent: 122,
+                mainAxisExtent: 120,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
@@ -2676,11 +2649,17 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(color: p.fill, shape: BoxShape.circle),
-        child: Icon(icon, size: 18, color: p.labelSecondary),
+      child: SizedBox(
+        width: 44,
+        height: 44,
+        child: Center(
+          child: Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(color: p.fill, shape: BoxShape.circle),
+            child: Icon(icon, size: 18, color: p.labelSecondary),
+          ),
+        ),
       ),
     );
   }
@@ -2758,17 +2737,21 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
           const SizedBox(height: 12),
           Text(
             yearEmpty ? 'Нет данных: цикл на $_year г. не запущен' : 'Месяцев в графике: $activeMonths из 12',
-            style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: p.labelSecondary),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.labelSecondary),
           ),
           if (overtimeTotal > 0 || vacationTotal > 0 || sickTotal > 0) ...<Widget>[
             const SizedBox(height: 6),
             Text(
               <String>[
-                if (overtimeTotal > 0) '⭐ подработок: $overtimeTotal',
-                if (vacationTotal > 0) '🏖️ отпуск: $vacationTotal дн.',
-                if (sickTotal > 0) '💊 больничный: $sickTotal дн.',
+                if (overtimeTotal > 0) 'подработки: $overtimeTotal',
+                if (vacationTotal > 0) 'отпуск: $vacationTotal дн.',
+                if (sickTotal > 0) 'больничный: $sickTotal дн.',
               ].join('   '),
-              style: TextStyle(fontSize: 11.5, color: p.labelTertiary),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 13, color: p.labelSecondary),
             ),
           ],
           if (yearEmpty) ...<Widget>[
@@ -2809,16 +2792,17 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
       opacity: inactive ? 0.55 : 1,
       child: Material(
         color: p.card,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           onTap: () {
             widget.onMonthSelected(summary.month);
             Navigator.of(context).pop();
           },
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: summary.isCurrent ? p.accent : p.separator,
                 width: summary.isCurrent ? 1.5 : 0.6,
@@ -2842,9 +2826,9 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
                     inactive ? '—' : formatMoney(stats.total),
                     maxLines: 1,
                     style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.6,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.4,
                       color: inactive ? p.labelSecondary : p.label,
                       fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
                     ),
@@ -2854,7 +2838,7 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
                   caption,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 11.5, color: p.labelTertiary),
+                  style: TextStyle(fontSize: 12, color: p.labelTertiary),
                 ),
               ],
             ),
