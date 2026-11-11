@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +14,7 @@ const String _kStoreRates = 'shifts.rates.v1';
 const String _kStoreRatesHistory = 'shifts.ratesHistory.v1';
 const String _kStoreDayColor = 'shifts.dayColor.v1';
 const String _kStoreNightColor = 'shifts.nightColor.v1';
+const String kStoreThemeMode = 'shifts.themeMode.v1';
 
 // ---------------------------------------------------------------------------
 // Русские подписи (собственные легковесные хелперы, без intl)
@@ -313,37 +315,392 @@ class WageRates {
 }
 
 // ---------------------------------------------------------------------------
+// Дизайн-система: токены палитры (iOS 18, light / dark)
+// ---------------------------------------------------------------------------
+final class IosPalette {
+  const IosPalette({
+    required this.brightness,
+    required this.canvas,
+    required this.card,
+    required this.cardAlt,
+    required this.label,
+    required this.labelSecondary,
+    required this.labelTertiary,
+    required this.separator,
+    required this.fill,
+    required this.accent,
+    required this.accentSoft,
+    required this.accentDeep,
+    required this.accentSolid,
+    required this.onAccent,
+    required this.segmentThumb,
+    required this.today,
+    required this.cycleStart,
+    required this.manual,
+    required this.warning,
+    required this.warningSoft,
+    required this.danger,
+    required this.dangerSoft,
+    required this.shadow,
+    required this.noneBg,
+    required this.noneFg,
+    required this.offBg,
+    required this.offFg,
+  });
+
+  final Brightness brightness;
+
+  /// Фон экрана.
+  final Color canvas;
+
+  /// Фон карточек.
+  final Color card;
+
+  /// Альтернативный фон карточек (снекбар в тёмной теме, группы).
+  final Color cardAlt;
+
+  /// Основной текст.
+  final Color label;
+
+  /// Второстепенный текст.
+  final Color labelSecondary;
+
+  /// Третичный текст / полупрозрачные подписи.
+  final Color labelTertiary;
+
+  /// Разделители и рамки.
+  final Color separator;
+
+  /// Заливка полей ввода и неактивных сегментов.
+  final Color fill;
+
+  /// Акцент (системный синий).
+  final Color accent;
+
+  /// Полупрозрачный акцент для активных пилюль.
+  final Color accentSoft;
+
+  /// Текст и иконки на тонированной подложке [accentSoft] (повышенный контраст).
+  final Color accentDeep;
+
+  /// Плотная заливка основных кнопок; в светлой теме — #007AFF (как в iOS,
+  /// ≈4.0:1 для крупного/полужирного текста), в тёмной — затемнённый #0A6CD6
+  /// для контраста ≥ 4.5:1 с [onAccent].
+  final Color accentSolid;
+
+  /// Текст и иконки на [accentSolid].
+  final Color onAccent;
+
+  /// «Таблетка» активного сегмента.
+  final Color segmentThumb;
+
+  /// Обводка «сегодня».
+  final Color today;
+
+  /// Обводка старта цикла.
+  final Color cycleStart;
+
+  /// Обводка ручной правки.
+  final Color manual;
+
+  /// Предупреждающий текст.
+  final Color warning;
+
+  /// Фон предупреждающего баннера.
+  final Color warningSoft;
+
+  /// Опасное действие.
+  final Color danger;
+
+  /// Полупрозрачная подложка опасного действия.
+  final Color dangerSoft;
+
+  /// Тень карточек.
+  final Color shadow;
+
+  /// Ячейка «не задано».
+  final Color noneBg;
+  final Color noneFg;
+
+  /// Ячейка «выходной».
+  final Color offBg;
+  final Color offFg;
+
+  bool get isDark => brightness == Brightness.dark;
+
+  static const IosPalette light = IosPalette(
+    brightness: Brightness.light,
+    canvas: Color(0xFFF2F2F7),
+    card: Color(0xFFFFFFFF),
+    cardAlt: Color(0xFFF7F7FA),
+    label: Color(0xFF000000),
+    labelSecondary: Color(0xFF8A8A8E),
+    labelTertiary: Color(0xFFC4C4C8),
+    separator: Color(0xFFE3E3E8),
+    fill: Color(0xFFEDEDF0),
+    accent: Color(0xFF007AFF),
+    accentSoft: Color(0x1A007AFF),
+    accentDeep: Color(0xFF0055B8),
+    accentSolid: Color(0xFF007AFF),
+    onAccent: Color(0xFFFFFFFF),
+    segmentThumb: Color(0xFFFFFFFF),
+    today: Color(0xFF007AFF),
+    cycleStart: Color(0xFFAF52DE),
+    manual: Color(0xFFFF9500),
+    warning: Color(0xFFB25000),
+    warningSoft: Color(0xFFFFF4E0),
+    danger: Color(0xFFFF3B30),
+    dangerSoft: Color(0x14FF3B30),
+    shadow: Color(0x0F000000),
+    noneBg: Color(0xFFEFF0F5),
+    noneFg: Color(0xFF9AA0AE),
+    offBg: Color(0xFFE8EAF1),
+    offFg: Color(0xFF5A6172),
+  );
+
+  static const IosPalette dark = IosPalette(
+    brightness: Brightness.dark,
+    canvas: Color(0xFF000000),
+    card: Color(0xFF1C1C1E),
+    cardAlt: Color(0xFF2C2C2E),
+    label: Color(0xFFFFFFFF),
+    labelSecondary: Color(0xFF98989F),
+    labelTertiary: Color(0xFF6C6C70),
+    separator: Color(0xFF38383A),
+    fill: Color(0xFF2C2C2E),
+    accent: Color(0xFF0A84FF),
+    accentSoft: Color(0x2E0A84FF),
+    accentDeep: Color(0xFF0A84FF),
+    accentSolid: Color(0xFF0A6CD6),
+    onAccent: Color(0xFFFFFFFF),
+    segmentThumb: Color(0xFF636366),
+    today: Color(0xFF0A84FF),
+    cycleStart: Color(0xFFBF5AF2),
+    manual: Color(0xFFFF9F0A),
+    warning: Color(0xFFFFB340),
+    warningSoft: Color(0x332B1F0A),
+    danger: Color(0xFFFF453A),
+    dangerSoft: Color(0x24FF453A),
+    shadow: Color(0x00000000),
+    noneBg: Color(0xFF232326),
+    noneFg: Color(0xFF8A8A8E),
+    offBg: Color(0xFF2C2C2E),
+    offFg: Color(0xFFB0B0B6),
+  );
+}
+
+/// Палитра текущей темы.
+IosPalette iosPalette(BuildContext context) {
+  final ThemeData theme = Theme.of(context);
+  return theme.brightness == Brightness.dark ? IosPalette.dark : IosPalette.light;
+}
+
+/// Единый стиль карточки в духе iOS 18 inset grouped.
+BoxDecoration iosCardDecoration(IosPalette p, {double radius = 22}) {
+  return BoxDecoration(
+    color: p.card,
+    borderRadius: BorderRadius.circular(radius),
+    border: Border.all(color: p.separator, width: 0.6),
+    boxShadow: p.shadow == Colors.transparent
+        ? null
+        : <BoxShadow>[
+            BoxShadow(color: p.shadow, blurRadius: 20, offset: const Offset(0, 6)),
+          ],
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Цветовые палитры (фон + текст) для ячеек календаря
 // ---------------------------------------------------------------------------
 class ShiftPalette {
-  const ShiftPalette(this.background, this.foreground);
+  const ShiftPalette(this.background, this.foreground, {this.darkBackground, this.darkForeground});
   final Color background;
   final Color foreground;
+  final Color? darkBackground;
+  final Color? darkForeground;
+
+  Color bgFor(bool dark) => dark ? (darkBackground ?? background) : background;
+  Color fgFor(bool dark) => dark ? (darkForeground ?? foreground) : foreground;
 }
 
 const List<ShiftPalette> kDayPalettes = <ShiftPalette>[
-  ShiftPalette(Color(0xFFFFF1C9), Color(0xFF8A5A00)),
-  ShiftPalette(Color(0xFFDDF3DF), Color(0xFF1B6B33)),
-  ShiftPalette(Color(0xFFDCE9FF), Color(0xFF17427F)),
-  ShiftPalette(Color(0xFFFFE3D6), Color(0xFF8C3B12)),
-  ShiftPalette(Color(0xFFEADDFF), Color(0xFF4B2A85)),
-  ShiftPalette(Color(0xFFD6F1F5), Color(0xFF0F5A66)),
+  ShiftPalette(
+    Color(0xFFFFF1C9),
+    Color(0xFF8A5A00),
+    darkBackground: Color(0xFF3A2E14),
+    darkForeground: Color(0xFFFFD479),
+  ),
+  ShiftPalette(
+    Color(0xFFDDF3DF),
+    Color(0xFF1B6B33),
+    darkBackground: Color(0xFF162E1C),
+    darkForeground: Color(0xFF7FE39B),
+  ),
+  ShiftPalette(
+    Color(0xFFDCE9FF),
+    Color(0xFF17427F),
+    darkBackground: Color(0xFF152438),
+    darkForeground: Color(0xFF87BDFF),
+  ),
+  ShiftPalette(
+    Color(0xFFFFE3D6),
+    Color(0xFF8C3B12),
+    darkBackground: Color(0xFF3A2115),
+    darkForeground: Color(0xFFFFB48A),
+  ),
+  ShiftPalette(
+    Color(0xFFEADDFF),
+    Color(0xFF4B2A85),
+    darkBackground: Color(0xFF27203A),
+    darkForeground: Color(0xFFC6AAFF),
+  ),
+  ShiftPalette(
+    Color(0xFFD6F1F5),
+    Color(0xFF0F5A66),
+    darkBackground: Color(0xFF102B2E),
+    darkForeground: Color(0xFF7FDCE8),
+  ),
 ];
 
 const List<ShiftPalette> kNightPalettes = <ShiftPalette>[
-  ShiftPalette(Color(0xFF2A3161), Color(0xFFDCE3FF)),
-  ShiftPalette(Color(0xFF1F2A44), Color(0xFFBFCFF7)),
-  ShiftPalette(Color(0xFF3B2B57), Color(0xFFE7D9FF)),
-  ShiftPalette(Color(0xFF1D3B33), Color(0xFFC5F0DF)),
-  ShiftPalette(Color(0xFF23303B), Color(0xFFB9E3F7)),
-  ShiftPalette(Color(0xFF3A2A2A), Color(0xFFF7D9D0)),
+  ShiftPalette(
+    Color(0xFF2A3161),
+    Color(0xFFDCE3FF),
+    darkBackground: Color(0xFF232944),
+    darkForeground: Color(0xFFDCE3FF),
+  ),
+  ShiftPalette(
+    Color(0xFF1F2A44),
+    Color(0xFFBFCFF7),
+    darkBackground: Color(0xFF1A2336),
+    darkForeground: Color(0xFFBFCFF7),
+  ),
+  ShiftPalette(
+    Color(0xFF3B2B57),
+    Color(0xFFE7D9FF),
+    darkBackground: Color(0xFF2C2140),
+    darkForeground: Color(0xFFE7D9FF),
+  ),
+  ShiftPalette(
+    Color(0xFF1D3B33),
+    Color(0xFFC5F0DF),
+    darkBackground: Color(0xFF162E28),
+    darkForeground: Color(0xFFC5F0DF),
+  ),
+  ShiftPalette(
+    Color(0xFF23303B),
+    Color(0xFFB9E3F7),
+    darkBackground: Color(0xFF1B2630),
+    darkForeground: Color(0xFFB9E3F7),
+  ),
+  ShiftPalette(
+    Color(0xFF3A2A2A),
+    Color(0xFFF7D9D0),
+    darkBackground: Color(0xFF2E2121),
+    darkForeground: Color(0xFFF7D9D0),
+  ),
 ];
 
-const Color kColorToday = Color(0xFF2C6BFF);
-const Color kColorCycleStart = Color(0xFF8B44D8);
-const Color kColorManual = Color(0xFFFF8A1F);
-const Color kColorTextMuted = Color(0xFF6B7280);
-const Color kColorSurface = Color(0xFFF6F7FB);
+// ---------------------------------------------------------------------------
+// Темы приложения (iOS 18 / Material 3)
+// ---------------------------------------------------------------------------
+final class AppTheme {
+  const AppTheme._();
+
+  static ThemeData light() => _build(IosPalette.light);
+
+  static ThemeData dark() => _build(IosPalette.dark);
+
+  static ThemeData _build(IosPalette p) {
+    final ColorScheme scheme = ColorScheme.fromSeed(seedColor: p.accent, brightness: p.brightness).copyWith(
+      primary: p.accent,
+      surface: p.card,
+      onSurface: p.label,
+      error: p.danger,
+      onError: Colors.white,
+    );
+
+    final ThemeData base = ThemeData(useMaterial3: true, colorScheme: scheme);
+
+    final TextTheme textTheme = base.textTheme.copyWith(
+      titleLarge: base.textTheme.titleLarge?.copyWith(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.3,
+        color: p.label,
+      ),
+      titleMedium: base.textTheme.titleMedium?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.2,
+        color: p.label,
+      ),
+      bodyMedium: base.textTheme.bodyMedium?.copyWith(
+        fontSize: 14.5,
+        letterSpacing: -0.1,
+        color: p.label,
+      ),
+      bodySmall: base.textTheme.bodySmall?.copyWith(color: p.labelSecondary),
+      labelLarge: base.textTheme.labelLarge?.copyWith(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: p.label,
+      ),
+    );
+
+    return base.copyWith(
+      scaffoldBackgroundColor: p.canvas,
+      canvasColor: p.canvas,
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      textTheme: textTheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: p.canvas,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        centerTitle: false,
+        foregroundColor: p.label,
+        titleTextStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.4,
+          color: p.label,
+        ),
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
+        },
+      ),
+      dividerTheme: DividerThemeData(color: p.separator, thickness: 0.6, space: 0.6),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: p.isDark ? p.cardAlt : const Color(0xFF1C1C1E),
+        contentTextStyle: const TextStyle(color: Colors.white),
+        behavior: SnackBarBehavior.floating,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: p.card,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        modalBackgroundColor: Colors.transparent,
+      ),
+    );
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Расчетный период
@@ -438,32 +795,54 @@ void main() async {
   runApp(ShiftsApp(prefs: prefs));
 }
 
-class ShiftsApp extends StatelessWidget {
+class ShiftsApp extends StatefulWidget {
   const ShiftsApp({super.key, required this.prefs});
 
   final SharedPreferences prefs;
 
   @override
+  State<ShiftsApp> createState() => _ShiftsAppState();
+}
+
+class _ShiftsAppState extends State<ShiftsApp> {
+  ThemeMode _mode = ThemeMode.system;
+
+  @override
+  void initState() {
+    super.initState();
+    _mode = _parseMode(widget.prefs.getString(kStoreThemeMode));
+  }
+
+  static ThemeMode _parseMode(String? raw) {
+    switch (raw) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  void _setMode(ThemeMode mode) {
+    setState(() => _mode = mode);
+    widget.prefs.setString(kStoreThemeMode, mode.name);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = ColorScheme.fromSeed(seedColor: const Color(0xFF3F51B5));
     return MaterialApp(
       title: 'Мои смены',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: scheme,
-        scaffoldBackgroundColor: kColorSurface,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: kColorSurface,
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: false,
-        ),
-        snackBarTheme: const SnackBarThemeData(
-          behavior: SnackBarBehavior.floating,
-        ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: _mode,
+      home: ShiftsPage(
+        prefs: widget.prefs,
+        themeMode: _mode,
+        onThemeModeChanged: _setMode,
       ),
-      home: ShiftsPage(prefs: prefs),
     );
   }
 }
@@ -472,9 +851,16 @@ class ShiftsApp extends StatelessWidget {
 // Главный экран
 // ---------------------------------------------------------------------------
 class ShiftsPage extends StatefulWidget {
-  const ShiftsPage({super.key, required this.prefs});
+  const ShiftsPage({
+    super.key,
+    required this.prefs,
+    this.themeMode = ThemeMode.system,
+    this.onThemeModeChanged,
+  });
 
   final SharedPreferences prefs;
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode>? onThemeModeChanged;
 
   @override
   State<ShiftsPage> createState() => _ShiftsPageState();
@@ -757,75 +1143,92 @@ class _ShiftsPageState extends State<ShiftsPage> {
     );
   }
 
-  BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      boxShadow: const <BoxShadow>[
-        BoxShadow(color: Color(0x0D000000), blurRadius: 10, offset: Offset(0, 4)),
-      ],
-    );
-  }
-
-  ShiftPalette _paletteFor(ShiftStatus status) {
+  ShiftPalette _paletteFor(ShiftStatus status, bool dark) {
     if (status.isNight) return kNightPalettes[_nightColorIndex];
     if (status.isWork) return kDayPalettes[_dayColorIndex];
-    if (status.isVacation) return const ShiftPalette(Color(0xFFDFF5E1), Color(0xFF1B6B33));
-    if (status.isSick) return const ShiftPalette(Color(0xFFFDE4E4), Color(0xFF9B1C1C));
-    if (status.key == St.none.key) return const ShiftPalette(Color(0xFFEFF0F5), Color(0xFF9AA0AE));
-    return const ShiftPalette(Color(0xFFE8EAF1), Color(0xFF5A6172));
+    if (status.isVacation) {
+      return dark
+          ? const ShiftPalette(Color(0xFFDFF5E1), Color(0xFF1B6B33), darkBackground: Color(0xFF16301D), darkForeground: Color(0xFF7FE39B))
+          : const ShiftPalette(Color(0xFFDFF5E1), Color(0xFF1B6B33));
+    }
+    if (status.isSick) {
+      return dark
+          ? const ShiftPalette(Color(0xFFFDE4E4), Color(0xFF9B1C1C), darkBackground: Color(0xFF3A1A1A), darkForeground: Color(0xFFFF9C9C))
+          : const ShiftPalette(Color(0xFFFDE4E4), Color(0xFF9B1C1C));
+    }
+    final IosPalette p = dark ? IosPalette.dark : IosPalette.light;
+    if (status.key == St.none.key) return ShiftPalette(p.noneBg, p.noneFg);
+    return ShiftPalette(p.offBg, p.offFg);
   }
 
   // ------------------------- Построение UI -------------------------
 
   @override
   Widget build(BuildContext context) {
+    final IosPalette p = iosPalette(context);
     final PeriodStats stats = _statsFor(_visibleMonth, _period);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: p.canvas,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarBrightness: p.isDark ? Brightness.dark : Brightness.light,
+          statusBarIconBrightness: p.isDark ? Brightness.light : Brightness.dark,
+          statusBarColor: Colors.transparent,
+        ),
+        title: Text(
           'Мои смены',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.4, color: p.label),
         ),
         actions: <Widget>[
           TextButton.icon(
             onPressed: _openYearCycleDialog,
             style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.onSurface,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              backgroundColor: p.accentSoft,
+              foregroundColor: p.accentDeep,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: const StadiumBorder(),
+              textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
-            icon: const Icon(Icons.add_circle_outline, size: 18),
-            label: const Text('Цикл', style: TextStyle(fontWeight: FontWeight.w700)),
+            icon: const Icon(Icons.add_rounded, size: 16),
+            label: const Text('Цикл'),
           ),
-          IconButton(
-            onPressed: _openYearOverview,
+          const SizedBox(width: 8),
+          _appBarIcon(
+            icon: Icons.bar_chart_rounded,
             tooltip: 'Сводка за год',
-            icon: const Icon(Icons.bar_chart_rounded),
+            onPressed: _openYearOverview,
+            p: p,
           ),
-          IconButton(
-            onPressed: _openSettingsSheet,
+          const SizedBox(width: 8),
+          _appBarIcon(
+            icon: Icons.settings_outlined,
             tooltip: 'Настройки',
-            icon: const Icon(Icons.settings_outlined),
+            onPressed: _openSettingsSheet,
+            p: p,
           ),
-          const SizedBox(width: 2),
+          const SizedBox(width: 16),
         ],
       ),
       body: SwipeArea(
         onSwipeLeft: () => _shiftMonth(1),
         onSwipeRight: () => _shiftMonth(-1),
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 28),
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
           children: <Widget>[
             _buildMonthHeader(),
-            const SizedBox(height: 8),
             if (_monthIsEmpty(_visibleMonth)) ...<Widget>[
               _buildInactiveBanner(),
-              const SizedBox(height: 10),
-            ],
+              const SizedBox(height: 12),
+            ] else
+              const SizedBox(height: 4),
             _buildSummaryCard(stats),
             const SizedBox(height: 12),
             _buildCalendarCard(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             _buildLegend(),
           ],
         ),
@@ -833,94 +1236,148 @@ class _ShiftsPageState extends State<ShiftsPage> {
     );
   }
 
+  /// Компактная иконка в «плитке» для AppBar.
+  Widget _appBarIcon({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onPressed,
+    required IosPalette p,
+  }) {
+    return Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(color: p.fill, borderRadius: BorderRadius.circular(11)),
+      child: IconButton(
+        onPressed: onPressed,
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        iconSize: 18,
+        color: p.label,
+        constraints: const BoxConstraints(),
+        icon: Icon(icon),
+      ),
+    );
+  }
+
+  /// Круглая кнопка-иконка (навигация по месяцам, закрытие шторки).
+  Widget _circleButton(IconData icon, {VoidCallback? onTap, double size = 32, IosPalette? palette}) {
+    final IosPalette p = palette ?? iosPalette(context);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(color: p.fill, shape: BoxShape.circle),
+        child: Icon(icon, size: 18, color: p.labelSecondary),
+      ),
+    );
+  }
+
   Widget _buildMonthHeader() {
-    return Row(
-      children: <Widget>[
-        IconButton(
-          onPressed: () => _shiftMonth(-1),
-          tooltip: 'Предыдущий месяц',
-          icon: const Icon(Icons.chevron_left),
-        ),
-        Expanded(
-          child: Tooltip(
-            message: 'Свайп ← → переключает месяцы. Тап — сводка за год.',
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
+    final IosPalette p = iosPalette(context);
+    final DateTime today = todayUtc();
+    final bool showToday = _visibleMonth.year != today.year || _visibleMonth.month != today.month;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 12),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: _openYearOverview,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Flexible(
-                          child: Text(
-                            formatMonthRu(_visibleMonth),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 16.5, fontWeight: FontWeight.w800, letterSpacing: -0.2),
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        const Icon(Icons.unfold_more, size: 15, color: kColorTextMuted),
-                      ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    formatMonthRu(_visibleMonth),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.9,
+                      color: p.label,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _cycleRules.isEmpty
-                          ? 'Цикл не задан • свайп ← →'
-                          : 'Точек старта: ${_cycleRules.where((CycleRule r) => parseDateKey(r.startDate).year == _visibleMonth.year).length} • свайп ← →',
-                      style: const TextStyle(fontSize: 10.5, color: kColorTextMuted),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _cycleRules.isEmpty
+                        ? 'Цикл не задан • свайп ← →'
+                        : 'Точек старта: ${_cycleRules.where((CycleRule r) => parseDateKey(r.startDate).year == _visibleMonth.year).length} • свайп ← →',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: p.labelSecondary),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-        IconButton(
-          onPressed: () => _shiftMonth(1),
-          tooltip: 'Следующий месяц',
-          icon: const Icon(Icons.chevron_right),
-        ),
-        IconButton(
-          onPressed: () => setState(() => _visibleMonth = firstDayOfMonth(todayUtc())),
-          tooltip: 'Сегодня',
-          icon: const Icon(Icons.today_outlined),
-        ),
-      ],
+          const SizedBox(width: 12),
+          if (showToday) ...<Widget>[
+            Flexible(
+              child: Semantics(
+                button: true,
+                label: 'Текущий месяц',
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _visibleMonth = firstDayOfMonth(todayUtc())),
+                  child: Container(
+                    height: 34,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: p.accentSoft,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Сегодня',
+                        maxLines: 1,
+                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.accentDeep),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+          _circleButton(Icons.chevron_left_rounded, onTap: () => _shiftMonth(-1), palette: p),
+          const SizedBox(width: 8),
+          _circleButton(Icons.chevron_right_rounded, onTap: () => _shiftMonth(1), palette: p),
+        ],
+      ),
     );
   }
 
   Widget _buildInactiveBanner() {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: () => _pickCycleShift(
-          utcDay(_visibleMonth.year, 1, 1),
-          title: 'Старт цикла с 1 января ${_visibleMonth.year} г.',
+    final IosPalette p = iosPalette(context);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _pickCycleShift(
+        utcDay(_visibleMonth.year, 1, 1),
+        title: 'Старт цикла с 1 января ${_visibleMonth.year} г.',
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: p.warningSoft,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: p.warning.withValues(alpha: 0.25), width: 0.8),
         ),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF4E0),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFFFD79A)),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  '📅 Цикл на ${_visibleMonth.year} г. не начат. Нажмите для старта с 1 янв.',
-                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
-                ),
+        child: Row(
+          children: <Widget>[
+            const Text('📅', style: TextStyle(fontSize: 18)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Цикл на ${_visibleMonth.year} г. не запущен. Нажмите, чтобы начать с 1 янв.',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.warning, height: 1.25),
               ),
-              Icon(Icons.chevron_right, size: 18, color: Theme.of(context).colorScheme.primary),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -929,75 +1386,147 @@ class _ShiftsPageState extends State<ShiftsPage> {
   Widget _buildSummaryCard(PeriodStats stats) {
     final bool hasExtras = stats.overtimeCount > 0 || stats.vacationCount > 0 || stats.sickCount > 0;
     final WageRates rates = _ratesForMonth(monthKey(_visibleMonth.year, _visibleMonth.month));
+    final IosPalette p = iosPalette(context);
+    final List<FontFeature> tabular = const <FontFeature>[FontFeature.tabularFigures()];
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-      decoration: _cardDecoration(),
+      padding: const EdgeInsets.all(16),
+      decoration: iosCardDecoration(p),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            _period.summaryLabel,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kColorTextMuted),
-          ),
-          const SizedBox(height: 10),
           PeriodTabs(
             value: _period,
             onChanged: (PeriodMode mode) => setState(() => _period = mode),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Expanded(
-                child: Text(
-                  formatMoney(stats.total),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 27, fontWeight: FontWeight.w800, letterSpacing: -0.8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      _period.summaryLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                        color: p.labelSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        formatMoney(stats.total),
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -1,
+                          color: p.label,
+                          fontFeatures: tabular,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
                     '${formatHours(stats.hours)} ч',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: p.label,
+                      fontFeatures: tabular,
+                    ),
                   ),
-                  const Text('часов', style: TextStyle(fontSize: 10, color: kColorTextMuted)),
+                  Text('часов', style: TextStyle(fontSize: 11, color: p.labelTertiary)),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          const Divider(height: 1, thickness: 0.6),
-          const SizedBox(height: 10),
-          Text(
-            '☀️ Дней: ${stats.dayCount} • 🌙 Ночей: ${stats.nightCount}',
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+          const SizedBox(height: 14),
+          Container(height: 0.6, color: p.separator),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: <Widget>[
+              _chip('☀️ Дней: ${stats.dayCount}', p),
+              _chip('🌙 Ночей: ${stats.nightCount}', p),
+            ],
           ),
           if (hasExtras) ...<Widget>[
-            const SizedBox(height: 6),
-            if (stats.overtimeCount > 0)
-              _extraRow('⭐ Подработок: ${stats.overtimeCount}'),
+            const SizedBox(height: 12),
+            if (stats.overtimeCount > 0) _extraRow('⭐ Подработок', '${stats.overtimeCount}', p),
             if (stats.vacationCount > 0)
-              _extraRow('🏖️ Отпуск: ${stats.vacationCount} дн. • ${formatMoney(stats.vacationMoney)}'),
+              _extraRow('🏖️ Отпуск: ${stats.vacationCount} дн.', formatMoney(stats.vacationMoney), p),
             if (stats.sickCount > 0)
-              _extraRow('💊 Больничный: ${stats.sickCount} дн. • ${formatMoney(stats.sickMoney)}'),
+              _extraRow('💊 Больничный: ${stats.sickCount} дн.', formatMoney(stats.sickMoney), p),
           ],
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             'Ставки: ${formatRate(rates.dayRate)} / ${formatRate(rates.nightRate)} ₽/ч • индексация ${_activeRateKey(monthKey(_visibleMonth.year, _visibleMonth.month))}',
-            style: const TextStyle(fontSize: 10.5, color: kColorTextMuted),
+            style: TextStyle(fontSize: 11.5, color: p.labelTertiary, height: 1.25),
           ),
         ],
       ),
     );
   }
 
-  Widget _extraRow(String text) {
+  /// Компактная «пилюля» со статистикой.
+  Widget _chip(String text, IosPalette p) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(color: p.fill, borderRadius: BorderRadius.circular(100)),
+      child: Text(
+        text,
+        maxLines: 1,
+        style: TextStyle(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w600,
+          color: p.label,
+          fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+        ),
+      ),
+    );
+  }
+
+  Widget _extraRow(String label, String amount, IosPalette p) {
     return Padding(
-      padding: const EdgeInsets.only(top: 2),
-      child: Text(text, style: const TextStyle(fontSize: 12, color: Color(0xFF444B5A), fontWeight: FontWeight.w600)),
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12.5, color: p.labelSecondary),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            amount,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: p.label,
+              fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1006,28 +1535,30 @@ class _ShiftsPageState extends State<ShiftsPage> {
     final int month = _visibleMonth.month;
     final int leading = DateTime.utc(year, month, 1).weekday - 1;
     final int total = daysInMonth(year, month);
+    final IosPalette p = iosPalette(context);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
-      decoration: _cardDecoration(),
+      padding: const EdgeInsets.all(12),
+      decoration: iosCardDecoration(p),
       child: Column(
         children: <Widget>[
           Row(
-            children: kWeekdaysShort.map((String label) {
-              final bool weekend = label == 'Сб' || label == 'Вс';
+            children: List<Widget>.generate(kWeekdaysShort.length, (int i) {
+              final String label = kWeekdaysShort[i];
               return Expanded(
                 child: Center(
                   child: Text(
                     label,
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: weekend ? const Color(0xFFB0413E) : kColorTextMuted,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.4,
+                      color: i == 6 ? p.danger : p.labelSecondary,
                     ),
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ),
           const SizedBox(height: 8),
           GridView.builder(
@@ -1037,9 +1568,9 @@ class _ShiftsPageState extends State<ShiftsPage> {
             itemCount: leading + total,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisExtent: 64,
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 4,
+              mainAxisExtent: 66,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 5,
             ),
             itemBuilder: (BuildContext context, int index) {
               if (index < leading) return const SizedBox.shrink();
@@ -1052,48 +1583,61 @@ class _ShiftsPageState extends State<ShiftsPage> {
   }
 
   Widget _buildDayCell(DateTime date) {
+    final IosPalette p = iosPalette(context);
+    final bool dark = p.isDark;
     final ShiftStatus status = _statusFor(date);
-    final ShiftPalette palette = _paletteFor(status);
+    final ShiftPalette palette = _paletteFor(status, dark);
     final bool isToday = isSameDay(date, todayUtc());
     final bool isCycleStart = _cycleRuleStartingAt(date) != null;
     final bool isManual = _overrides.containsKey(dateKey(date));
 
-    Color borderColor = const Color(0x00000000);
+    Color borderColor = p.separator;
     double borderWidth = 0;
     if (isToday) {
-      borderColor = kColorToday;
+      borderColor = p.today;
       borderWidth = 2;
     } else if (isCycleStart) {
-      borderColor = kColorCycleStart;
+      borderColor = p.cycleStart;
       borderWidth = 2;
     } else if (isManual) {
-      borderColor = kColorManual;
+      borderColor = p.manual;
       borderWidth = 1.5;
     }
 
     final Widget cell = Container(
       decoration: BoxDecoration(
-        color: palette.background,
-        borderRadius: BorderRadius.circular(10),
+        color: palette.bgFor(dark),
+        borderRadius: BorderRadius.circular(14),
         border: borderWidth > 0 ? Border.all(color: borderColor, width: borderWidth) : null,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Text(
             '${date.day}',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: palette.foreground, height: 1),
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: palette.fgFor(dark),
+              height: 1,
+              fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+            ),
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: 2),
           Flexible(
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
                 status.short,
                 maxLines: 1,
-                style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: palette.foreground),
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w600,
+                  color: palette.fgFor(dark).withValues(alpha: 0.85),
+                ),
               ),
             ),
           ),
@@ -1109,141 +1653,148 @@ class _ShiftsPageState extends State<ShiftsPage> {
   }
 
   Widget _buildLegend() {
-    Widget item(Color color, String label, {double width = 1.6}) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: 14,
-            height: 14,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: color, width: width),
-            ),
-          ),
-          const SizedBox(width: 5),
-          Text(label, style: const TextStyle(fontSize: 10.5, color: kColorTextMuted)),
-        ],
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+    final IosPalette p = iosPalette(context);
+    return SizedBox(
+      width: double.infinity,
       child: Wrap(
         spacing: 14,
         runSpacing: 8,
         children: <Widget>[
-          item(kColorToday, 'сегодня', width: 2),
-          item(kColorCycleStart, 'старт цикла', width: 2),
-          item(kColorManual, 'ручная правка'),
+          _legendDot(p.today, 'сегодня', p),
+          _legendDot(p.cycleStart, 'старт цикла', p),
+          _legendDot(p.manual, 'ручная правка', p),
         ],
       ),
+    );
+  }
+
+  Widget _legendDot(Color color, String label, IosPalette p) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500, color: p.labelSecondary)),
+      ],
     );
   }
 
   // ------------------------- Диалог дня -------------------------
 
   Future<void> _openDayDialog(DateTime date) async {
+    final IosPalette pagePalette = iosPalette(context);
+    final bool dark = pagePalette.isDark;
     final ShiftStatus status = _statusFor(date);
     final bool hasOverride = _overrides.containsKey(dateKey(date));
     final CycleRule? startRule = _cycleRuleStartingAt(date);
-    final ShiftPalette palette = _paletteFor(status);
+    final ShiftPalette palette = _paletteFor(status, dark);
 
     final DayAction? action = await showDialog<DayAction>(
       context: context,
       builder: (BuildContext ctx) {
-        final ColorScheme scheme = Theme.of(ctx).colorScheme;
+        final IosPalette p = iosPalette(ctx);
         return AlertDialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
-          contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                formatDateRu(date),
-                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                kWeekdaysFull[date.weekday - 1],
-                style: const TextStyle(fontSize: 11.5, color: kColorTextMuted, fontWeight: FontWeight.w500),
-              ),
-            ],
-          ),
+          contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+          actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: palette.background,
-                    borderRadius: BorderRadius.circular(12),
+                    color: p.fill,
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        child: Text(
-                          status.short,
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: palette.foreground),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              formatDateRu(date),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: p.label,
+                                fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              status.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: p.labelSecondary),
+                            ),
+                          ],
                         ),
                       ),
-                      Text(
-                        status.label,
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: palette.foreground),
+                      const SizedBox(width: 12),
+                      Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: palette.bgFor(dark),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
+                _sectionTitle('Быстрая установка', p),
+                const SizedBox(height: 8),
                 Row(
                   children: <Widget>[
-                    Expanded(child: _quickAction(ctx, St.overtimeDay, date)),
+                    Expanded(child: _quickAction(ctx, St.overtimeDay, '☀️ Подр. День', date)),
                     const SizedBox(width: 8),
-                    Expanded(child: _quickAction(ctx, St.overtimeNight, date)),
+                    Expanded(child: _quickAction(ctx, St.overtimeNight, '🌙 Подр. Ночь', date)),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: <Widget>[
-                    Expanded(child: _quickAction(ctx, St.vacation, date)),
+                    Expanded(child: _quickAction(ctx, St.vacation, '🏖️ Отпуск', date)),
                     const SizedBox(width: 8),
-                    Expanded(child: _quickAction(ctx, St.sick, date)),
+                    Expanded(child: _quickAction(ctx, St.sick, '💊 Больничный', date)),
                   ],
                 ),
                 const SizedBox(height: 8),
-                _quickAction(ctx, St.manualOff, date),
-                if (hasOverride) ...<Widget>[
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    onPressed: () => Navigator.of(ctx).pop(const DayAction(DayAction.reset)),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(42),
-                      foregroundColor: scheme.primary,
+                _quickAction(ctx, St.manualOff, '☕ Внеплановый выходной', date),
+                const SizedBox(height: 16),
+                if (hasOverride)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _dialogButton(
+                      label: '🔄 Сбросить к исходному графику',
+                      background: p.accentSoft,
+                      foreground: p.accent,
+                      onTap: () => Navigator.of(ctx).pop(const DayAction(DayAction.reset)),
                     ),
-                    icon: const Icon(Icons.restart_alt, size: 18),
-                    label: const Text('🔄 Сбросить к исходному графику', style: TextStyle(fontSize: 12.5)),
                   ),
-                ],
-                const Divider(height: 22),
-                FilledButton.tonalIcon(
-                  onPressed: () => Navigator.of(ctx).pop(const DayAction(DayAction.startCycle)),
-                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(42)),
-                  icon: const Icon(Icons.rocket_launch_outlined, size: 18),
-                  label: const Text('🚀 Начать новый цикл с этой даты', style: TextStyle(fontSize: 12.5)),
+                _dialogButton(
+                  label: '🚀 Начать новый цикл с этой даты',
+                  background: p.accentSoft,
+                  foreground: p.accent,
+                  onTap: () => Navigator.of(ctx).pop(const DayAction(DayAction.startCycle)),
                 ),
                 if (startRule != null) ...<Widget>[
-                  const SizedBox(height: 6),
-                  TextButton.icon(
-                    onPressed: () => Navigator.of(ctx).pop(const DayAction(DayAction.deleteStart)),
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFFB3261E),
-                      minimumSize: const Size.fromHeight(40),
-                    ),
-                    icon: const Icon(Icons.delete_outline, size: 18),
-                    label: const Text('🗑️ Удалить эту точку старта', style: TextStyle(fontSize: 12.5)),
+                  const SizedBox(height: 8),
+                  _dialogButton(
+                    label: '🗑️ Удалить эту точку старта',
+                    background: p.dangerSoft,
+                    foreground: p.danger,
+                    onTap: () => Navigator.of(ctx).pop(const DayAction(DayAction.deleteStart)),
                   ),
                 ],
               ],
@@ -1252,6 +1803,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
+              style: TextButton.styleFrom(foregroundColor: p.accent),
               child: const Text('Закрыть'),
             ),
           ],
@@ -1286,24 +1838,58 @@ class _ShiftsPageState extends State<ShiftsPage> {
     }
   }
 
-  Widget _quickAction(BuildContext dialogContext, ShiftStatus status, DateTime date) {
+  Widget _quickAction(BuildContext dialogContext, ShiftStatus status, String label, DateTime date) {
     final bool active = _overrides[dateKey(date)] == status.key;
-    return OutlinedButton(
-      onPressed: () => Navigator.of(dialogContext).pop(DayAction(DayAction.overrideStatus, statusKey: status.key)),
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size.fromHeight(40),
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        side: BorderSide(
-          color: active ? Theme.of(dialogContext).colorScheme.primary : const Color(0xFFD5D8E2),
-          width: active ? 1.8 : 1,
+    final IosPalette p = iosPalette(dialogContext);
+    return Material(
+      color: active ? p.accentSoft : p.fill,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => Navigator.of(dialogContext).pop(DayAction(DayAction.overrideStatus, statusKey: status.key)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 13),
+          child: Center(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: active ? p.accent : p.label,
+              ),
+            ),
+          ),
         ),
-        backgroundColor: active ? Theme.of(dialogContext).colorScheme.primary.withAlpha(18) : null,
       ),
-      child: Text(
-        status.short,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+    );
+  }
+
+  /// Кнопка-действие внутри диалога дня.
+  Widget _dialogButton({
+    required String label,
+    required Color background,
+    required Color foreground,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: background,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          height: 46,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: foreground),
+          ),
+        ),
       ),
     );
   }
@@ -1314,21 +1900,22 @@ class _ShiftsPageState extends State<ShiftsPage> {
     final int? index = await showDialog<int>(
       context: context,
       builder: (BuildContext ctx) {
-        final ColorScheme scheme = Theme.of(ctx).colorScheme;
+        final IosPalette p = iosPalette(ctx);
+        final bool dark = p.isDark;
         return AlertDialog(
-          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 4),
-          contentPadding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+          titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 title ?? 'Новый цикл',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: p.label),
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 4),
               Text(
                 'Какая смена выпадает на ${formatDateRu(date)}?',
-                style: const TextStyle(fontSize: 11.5, color: kColorTextMuted, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: p.labelSecondary),
               ),
             ],
           ),
@@ -1339,27 +1926,52 @@ class _ShiftsPageState extends State<ShiftsPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: List<Widget>.generate(St.baseCycle.length, (int i) {
                   final ShiftStatus status = St.baseCycle[i];
-                  return ListTile(
-                    dense: true,
-                    visualDensity: VisualDensity.compact,
-                    leading: CircleAvatar(
-                      radius: 13,
-                      backgroundColor: scheme.primary.withAlpha(24),
-                      child: Text(
-                        '${i + 1}',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: scheme.primary),
+                  final ShiftPalette palette = _paletteFor(status, dark);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Material(
+                      color: p.fill,
+                      borderRadius: BorderRadius.circular(14),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () => Navigator.of(ctx).pop(i),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: palette.bgFor(dark),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  status.label,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w500, color: p.label),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                    title: Text(status.label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                    subtitle: Text(status.short, style: const TextStyle(fontSize: 11, color: kColorTextMuted)),
-                    onTap: () => Navigator.of(ctx).pop(i),
                   );
                 }),
               ),
             ),
           ),
           actions: <Widget>[
-            TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Отмена')),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              style: TextButton.styleFrom(foregroundColor: p.accent),
+              child: const Text('Отмена'),
+            ),
           ],
         );
       },
@@ -1399,6 +2011,7 @@ class _ShiftsPageState extends State<ShiftsPage> {
 
     int localDayColor = _dayColorIndex;
     int localNightColor = _nightColorIndex;
+    ThemeMode localThemeMode = widget.themeMode;
 
     WageRates collect() {
       return WageRates(
@@ -1414,107 +2027,216 @@ class _ShiftsPageState extends State<ShiftsPage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: Colors.white,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext sheetContext) {
         return StatefulBuilder(
           builder: (BuildContext ctx, StateSetter setSheetState) {
-            return Padding(
+            final IosPalette p = iosPalette(ctx);
+            return AnimatedPadding(
+              duration: const Duration(milliseconds: 160),
+              curve: Curves.easeOut,
               padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Text('Настройки', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Индексация: $editKey • открытый месяц: $ym',
-                      style: const TextStyle(fontSize: 11.5, color: kColorTextMuted),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: <Widget>[
-                        Expanded(child: _rateField(dayC, 'Дневная, ₽/ч')),
-                        const SizedBox(width: 10),
-                        Expanded(child: _rateField(nightC, 'Ночная, ₽/ч')),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: <Widget>[
-                        Expanded(child: _rateField(vacC, 'Отпуск, ₽/день')),
-                        const SizedBox(width: 10),
-                        Expanded(child: _rateField(sickC, 'Больничный, ₽/день')),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: <Widget>[
-                        Expanded(child: _rateField(dayHoursC, 'Часов: день')),
-                        const SizedBox(width: 10),
-                        Expanded(child: _rateField(nightHoursC, 'Часов: ночь')),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    const Text('Цвет дневных смен', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 8),
-                    _paletteRow(
-                      palettes: kDayPalettes,
-                      selectedIndex: localDayColor,
-                      onSelect: (int index) => setSheetState(() => localDayColor = index),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('Цвет ночных смен', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 8),
-                    _paletteRow(
-                      palettes: kNightPalettes,
-                      selectedIndex: localNightColor,
-                      onSelect: (int index) => setSheetState(() => localNightColor = index),
-                    ),
-                    const SizedBox(height: 22),
-                    FilledButton.icon(
-                      onPressed: () {
-                        final WageRates newRates = collect();
-                        setState(() {
-                          _ratesHistory[editKey] = newRates;
-                          if (_ratesHistory.length == 1) _baseRates = newRates;
-                          _dayColorIndex = localDayColor;
-                          _nightColorIndex = localNightColor;
-                        });
-                        _saveRates();
-                        Navigator.of(ctx).pop();
-                        _snack('Ставки сохранены для индексации $editKey');
-                      },
-                      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-                      icon: const Icon(Icons.save_outlined, size: 18),
-                      label: const Text('💾 Сохранить'),
-                    ),
-                    const SizedBox(height: 8),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        final WageRates newRates = collect();
-                        setState(() {
-                          _ratesHistory[ym] = newRates;
-                          if (_ratesHistory.length == 1) _baseRates = newRates;
-                          _dayColorIndex = localDayColor;
-                          _nightColorIndex = localNightColor;
-                        });
-                        _saveRates();
-                        Navigator.of(ctx).pop();
-                        _snack('Оклад повышен с $ym');
-                      },
-                      style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-                      icon: const Icon(Icons.trending_up, size: 18),
-                      label: const Text('📈 Повысить оклад'),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      '«Сохранить» обновляет ставки действующей индексации, «Повысить оклад» создает новую запись для открытого месяца.',
-                      style: TextStyle(fontSize: 10.5, color: kColorTextMuted, height: 1.35),
-                    ),
-                  ],
+              child: Container(
+                decoration: BoxDecoration(
+                  color: p.canvas,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+                  border: Border(top: BorderSide(color: p.separator, width: 0.6)),
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Center(
+                        child: Container(
+                          width: 36,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: p.labelTertiary.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              'Настройки',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.5,
+                                color: p.label,
+                              ),
+                            ),
+                          ),
+                          _circleButton(Icons.close_rounded, size: 30, palette: p, onTap: () => Navigator.of(ctx).pop()),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Индексация: $editKey • открытый месяц: $ym',
+                        style: TextStyle(fontSize: 11.5, color: p.labelTertiary),
+                      ),
+                      const SizedBox(height: 18),
+                      _sectionTitle('Оформление', p),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: _themePill(
+                              icon: Icons.brightness_auto_outlined,
+                              label: 'Системная',
+                              selected: localThemeMode == ThemeMode.system,
+                              p: p,
+                              onTap: () {
+                                setSheetState(() => localThemeMode = ThemeMode.system);
+                                widget.onThemeModeChanged?.call(ThemeMode.system);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _themePill(
+                              icon: Icons.light_mode_outlined,
+                              label: 'Тема светлая',
+                              selected: localThemeMode == ThemeMode.light,
+                              p: p,
+                              onTap: () {
+                                setSheetState(() => localThemeMode = ThemeMode.light);
+                                widget.onThemeModeChanged?.call(ThemeMode.light);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _themePill(
+                              icon: Icons.dark_mode_outlined,
+                              label: 'Тема тёмная',
+                              selected: localThemeMode == ThemeMode.dark,
+                              p: p,
+                              onTap: () {
+                                setSheetState(() => localThemeMode = ThemeMode.dark);
+                                widget.onThemeModeChanged?.call(ThemeMode.dark);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _sectionTitle('Ставки', p),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: <Widget>[
+                          Expanded(child: _rateField(dayC, 'Дневная, ₽/ч', p)),
+                          const SizedBox(width: 10),
+                          Expanded(child: _rateField(nightC, 'Ночная, ₽/ч', p)),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: <Widget>[
+                          Expanded(child: _rateField(vacC, 'Отпуск, ₽/день', p)),
+                          const SizedBox(width: 10),
+                          Expanded(child: _rateField(sickC, 'Больничный, ₽/день', p)),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: <Widget>[
+                          Expanded(child: _rateField(dayHoursC, 'Часов: день', p)),
+                          const SizedBox(width: 10),
+                          Expanded(child: _rateField(nightHoursC, 'Часов: ночь', p)),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _sectionTitle('Цвета смен', p),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Дневные смены',
+                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: p.labelSecondary),
+                      ),
+                      const SizedBox(height: 8),
+                      _paletteRow(
+                        palettes: kDayPalettes,
+                        selectedIndex: localDayColor,
+                        onSelect: (int index) => setSheetState(() => localDayColor = index),
+                        p: p,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Ночные смены',
+                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: p.labelSecondary),
+                      ),
+                      const SizedBox(height: 8),
+                      _paletteRow(
+                        palettes: kNightPalettes,
+                        selectedIndex: localNightColor,
+                        onSelect: (int index) => setSheetState(() => localNightColor = index),
+                        p: p,
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        height: 50,
+                        child: FilledButton(
+                          onPressed: () {
+                            final WageRates newRates = collect();
+                            setState(() {
+                              _ratesHistory[editKey] = newRates;
+                              if (_ratesHistory.length == 1) _baseRates = newRates;
+                              _dayColorIndex = localDayColor;
+                              _nightColorIndex = localNightColor;
+                            });
+                            _saveRates();
+                            Navigator.of(ctx).pop();
+                            _snack('Ставки сохранены для индексации $editKey');
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: p.accentSolid,
+                            foregroundColor: p.onAccent,
+                            minimumSize: Size.fromHeight(50),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                          ),
+                          child: const Text('💾 Сохранить'),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 50,
+                        child: FilledButton(
+                          onPressed: () {
+                            final WageRates newRates = collect();
+                            setState(() {
+                              _ratesHistory[ym] = newRates;
+                              if (_ratesHistory.length == 1) _baseRates = newRates;
+                              _dayColorIndex = localDayColor;
+                              _nightColorIndex = localNightColor;
+                            });
+                            _saveRates();
+                            Navigator.of(ctx).pop();
+                            _snack('Оклад повышен с $ym');
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: p.accentSoft,
+                            foregroundColor: p.accentDeep,
+                            minimumSize: Size.fromHeight(50),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                          ),
+                          child: const Text('📈 Повысить оклад'),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '«Сохранить» обновляет ставки действующей индексации, «Повысить оклад» создает новую запись для открытого месяца.',
+                        style: TextStyle(fontSize: 11, color: p.labelTertiary, height: 1.35),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -1531,25 +2253,99 @@ class _ShiftsPageState extends State<ShiftsPage> {
     nightHoursC.dispose();
   }
 
-  Widget _rateField(TextEditingController controller, String label) {
-    return TextField(
-      controller: controller,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-      ],
-      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(fontSize: 11.5),
-        isDense: true,
-        filled: true,
-        fillColor: const Color(0xFFF4F5F9),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        border: OutlineInputBorder(
+  /// Единый стиль заголовка секции настроек.
+  Widget _sectionTitle(String text, IosPalette p) {
+    return Text(
+      text.toUpperCase(),
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.6,
+        color: p.labelSecondary,
+      ),
+    );
+  }
+
+  /// Пилюля выбора темы.
+  Widget _themePill({
+    required IconData icon,
+    required String label,
+    required bool selected,
+    required IosPalette p,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: 38,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        decoration: BoxDecoration(
+          color: selected ? p.accentSoft : p.fill,
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          border: Border.all(color: selected ? p.accent : Colors.transparent, width: 1.2),
         ),
+        child: Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(icon, size: 15, color: selected ? p.accent : p.labelSecondary),
+                const SizedBox(width: 5),
+                Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: selected ? p.accent : p.labelSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _rateField(TextEditingController controller, String label, IosPalette p) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+      decoration: BoxDecoration(
+        color: p.fill,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: p.labelSecondary),
+          ),
+          TextField(
+            controller: controller,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: p.label,
+              fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+            ),
+            decoration: const InputDecoration(
+              isDense: true,
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1558,29 +2354,39 @@ class _ShiftsPageState extends State<ShiftsPage> {
     required List<ShiftPalette> palettes,
     required int selectedIndex,
     required ValueChanged<int> onSelect,
+    required IosPalette p,
   }) {
+    final bool dark = p.isDark;
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List<Widget>.generate(palettes.length, (int index) {
         final ShiftPalette palette = palettes[index];
         final bool selected = index == selectedIndex;
-        return Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: GestureDetector(
-            onTap: () => onSelect(index),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: palette.background,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: selected ? const Color(0xFF1D2433) : const Color(0xFFD5D8E2),
-                  width: selected ? 2.5 : 1,
-                ),
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => onSelect(index),
+          child: Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: palette.bgFor(dark),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: selected ? p.accent : p.separator,
+                width: selected ? 2 : 0.8,
               ),
+            ),
+            child: Center(
               child: selected
-                  ? Icon(Icons.check, size: 20, color: palette.foreground)
-                  : null,
+                  ? Icon(Icons.check_rounded, size: 14, color: palette.fgFor(dark))
+                  : Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: palette.fgFor(dark),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
             ),
           ),
         );
@@ -1600,10 +2406,11 @@ class PeriodTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final IosPalette p = iosPalette(context);
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFEDEFF5),
+        color: p.fill,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -1618,10 +2425,10 @@ class PeriodTabs extends StatelessWidget {
                 curve: Curves.easeOut,
                 padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
                 decoration: BoxDecoration(
-                  color: selected ? Colors.white : Colors.transparent,
+                  color: selected ? p.segmentThumb : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: selected
-                      ? const <BoxShadow>[BoxShadow(color: Color(0x14000000), blurRadius: 6, offset: Offset(0, 2))]
+                      ? <BoxShadow>[BoxShadow(color: p.shadow, blurRadius: 6, offset: const Offset(0, 2))]
                       : null,
                 ),
                 child: Text(
@@ -1632,7 +2439,7 @@ class PeriodTabs extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11.5,
                     fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                    color: selected ? const Color(0xFF1D2433) : kColorTextMuted,
+                    color: selected ? p.label : p.labelSecondary,
                   ),
                 ),
               ),
@@ -1767,6 +2574,7 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
 
   @override
   Widget build(BuildContext context) {
+    final IosPalette p = iosPalette(context);
     final List<MonthSummary> months = widget.buildMonths(_year, _period);
     double totalMoney = 0;
     double totalHours = 0;
@@ -1787,30 +2595,48 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: p.canvas,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarBrightness: p.isDark ? Brightness.dark : Brightness.light,
+          statusBarIconBrightness: p.isDark ? Brightness.light : Brightness.dark,
+          statusBarColor: Colors.transparent,
+        ),
         title: Text(
           'Сводка за $_year г.',
-          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.4, color: p.label),
         ),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () => _shiftYear(-1),
-            tooltip: 'Предыдущий год',
-            icon: const Icon(Icons.chevron_left),
-          ),
-          IconButton(
-            onPressed: () => _shiftYear(1),
-            tooltip: 'Следующий год',
-            icon: const Icon(Icons.chevron_right),
-          ),
-          const SizedBox(width: 2),
-        ],
       ),
       body: SwipeArea(
         onSwipeLeft: () => _shiftYear(1),
         onSwipeRight: () => _shiftYear(-1),
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
           children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 14, top: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _navButton(Icons.chevron_left_rounded, () => _shiftYear(-1), p),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      '$_year',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -1,
+                        color: p.label,
+                        fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ),
+                  _navButton(Icons.chevron_right_rounded, () => _shiftYear(1), p),
+                ],
+              ),
+            ),
             _buildYearTotals(
               totalMoney: totalMoney,
               totalHours: totalHours,
@@ -1828,20 +2654,33 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
               itemCount: months.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                mainAxisExtent: 126,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+                mainAxisExtent: 122,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
               ),
               itemBuilder: (BuildContext context, int index) => _buildMonthCard(months[index]),
             ),
-            const SizedBox(height: 12),
-            const Text(
+            const SizedBox(height: 14),
+            Text(
               'Тап по карточке месяца открывает его в календаре. Свайп ← → переключает год.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 10.5, color: kColorTextMuted),
+              style: TextStyle(fontSize: 11.5, color: p.labelTertiary, height: 1.3),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _navButton(IconData icon, VoidCallback onTap, IosPalette p) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(color: p.fill, shape: BoxShape.circle),
+        child: Icon(icon, size: 18, color: p.labelSecondary),
       ),
     );
   }
@@ -1856,76 +2695,101 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
     required int sickTotal,
   }) {
     final bool yearEmpty = activeMonths == 0;
+    final IosPalette p = iosPalette(context);
+    final List<FontFeature> tabular = const <FontFeature>[FontFeature.tabularFigures()];
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(color: Color(0x0D000000), blurRadius: 10, offset: Offset(0, 4)),
-        ],
-      ),
+      padding: const EdgeInsets.all(18),
+      decoration: iosCardDecoration(p),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             'Итого за $_year г. • ${_period.shortLabel}',
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: kColorTextMuted),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.labelSecondary),
           ),
           const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Expanded(
-                child: Text(
-                  formatMoney(totalMoney),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.8),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    formatMoney(totalMoney),
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -1,
+                      color: p.label,
+                      fontFeatures: tabular,
+                    ),
+                  ),
                 ),
               ),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
                     '${formatHours(totalHours)} ч',
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: p.labelSecondary,
+                      fontFeatures: tabular,
+                    ),
                   ),
                   Text(
                     'смен: $totalShifts',
-                    style: const TextStyle(fontSize: 10, color: kColorTextMuted),
+                    style: TextStyle(fontSize: 11, color: p.labelTertiary),
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          const Divider(height: 1, thickness: 0.6),
-          const SizedBox(height: 10),
+          const SizedBox(height: 14),
+          Container(height: 0.6, color: p.separator),
+          const SizedBox(height: 12),
           PeriodTabs(value: _period, onChanged: _changePeriod),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             yearEmpty ? 'Нет данных: цикл на $_year г. не запущен' : 'Месяцев в графике: $activeMonths из 12',
-            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Color(0xFF444B5A)),
+            style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: p.labelSecondary),
           ),
           if (overtimeTotal > 0 || vacationTotal > 0 || sickTotal > 0) ...<Widget>[
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               <String>[
                 if (overtimeTotal > 0) '⭐ подработок: $overtimeTotal',
                 if (vacationTotal > 0) '🏖️ отпуск: $vacationTotal дн.',
                 if (sickTotal > 0) '💊 больничный: $sickTotal дн.',
               ].join('   '),
-              style: const TextStyle(fontSize: 11, color: kColorTextMuted),
+              style: TextStyle(fontSize: 11.5, color: p.labelTertiary),
             ),
           ],
           if (yearEmpty) ...<Widget>[
-            const SizedBox(height: 10),
-            FilledButton.tonalIcon(
-              onPressed: _startCycle,
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(42)),
-              icon: const Icon(Icons.rocket_launch_outlined, size: 18),
-              label: Text('🚀 Запустить цикл с 1 января $_year г.', style: const TextStyle(fontSize: 12.5)),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 46,
+              child: FilledButton(
+                onPressed: _startCycle,
+                style: FilledButton.styleFrom(
+                  backgroundColor: p.accentSolid,
+                  foregroundColor: p.onAccent,
+                  minimumSize: Size.fromHeight(46),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                ),
+                child: Text(
+                  '🚀 Запустить цикл с 1 января $_year г.',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
           ],
         ],
@@ -1936,54 +2800,40 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
   Widget _buildMonthCard(MonthSummary summary) {
     final bool inactive = !summary.isActive;
     final PeriodStats stats = summary.stats;
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final List<String> extras = <String>[
-      if (stats.overtimeCount > 0) '⭐ ${stats.overtimeCount}',
-      if (stats.vacationCount > 0) '🏖️ ${stats.vacationCount}',
-      if (stats.sickCount > 0) '💊 ${stats.sickCount}',
-    ];
+    final IosPalette p = iosPalette(context);
+    final String caption = inactive
+        ? 'цикл не запущен'
+        : '${stats.dayCount + stats.nightCount} смен • ${formatHours(stats.hours)} ч';
 
     return Opacity(
       opacity: inactive ? 0.55 : 1,
       child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: p.card,
+        borderRadius: BorderRadius.circular(18),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           onTap: () {
             widget.onMonthSelected(summary.month);
             Navigator.of(context).pop();
           },
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: summary.isCurrent ? scheme.primary : const Color(0x14000000),
-                width: summary.isCurrent ? 2 : 1,
+                color: summary.isCurrent ? p.accent : p.separator,
+                width: summary.isCurrent ? 1.5 : 0.6,
               ),
             ),
-            padding: const EdgeInsets.fromLTRB(11, 9, 11, 9),
+            padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        kMonthsNominative[summary.month.month - 1],
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
-                      ),
-                    ),
-                    if (summary.isCurrent)
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(color: scheme.primary, shape: BoxShape.circle),
-                      ),
-                  ],
+                Text(
+                  kMonthsNominative[summary.month.month - 1],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: p.label),
                 ),
                 FittedBox(
                   fit: BoxFit.scaleDown,
@@ -1992,26 +2842,19 @@ class _YearOverviewPageState extends State<YearOverviewPage> {
                     inactive ? '—' : formatMoney(stats.total),
                     maxLines: 1,
                     style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.4,
-                      color: inactive ? kColorTextMuted : const Color(0xFF1D2433),
+                      fontSize: 19,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.6,
+                      color: inactive ? p.labelSecondary : p.label,
+                      fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
                     ),
                   ),
                 ),
                 Text(
-                  inactive
-                      ? 'нет графика'
-                      : '☀️ ${stats.dayCount} • 🌙 ${stats.nightCount} • ${formatHours(stats.hours)} ч',
+                  caption,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 10, color: kColorTextMuted, fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  extras.join('  '),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 11.5, color: p.labelTertiary),
                 ),
               ],
             ),
