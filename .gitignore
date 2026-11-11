@@ -48,3 +48,6 @@ app.*.map.json
 .widget_preview/
 .aider*
 .aider-desk/
+
+# Локальные артефакты сборки
+/artifacts/
